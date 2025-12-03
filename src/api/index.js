@@ -21,6 +21,26 @@ export const sessionApi = {
 };
 
 /**
+ * 偏好相关API
+ */
+export const preferenceApi = {
+    // 获取用户偏好
+    getPreference() {
+        return request.get('/preferences');
+    },
+
+    // 更新用户偏好
+    updatePreference(data) {
+        return request.put('/preferences', data);
+    },
+
+    // 重置用户偏好
+    resetPreference() {
+        return request.delete('/preferences');
+    }
+};
+
+/**
  * 体质相关API
  */
 export const constitutionApi = {
@@ -50,5 +70,6 @@ export const constitutionApi = {
 
 export default {
     sessionApi,
+    preferenceApi,
     constitutionApi
 };
