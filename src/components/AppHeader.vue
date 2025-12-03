@@ -2,7 +2,7 @@
     <header class="header">
         <router-link to="/" class="logo">
             <div class="logo-icon">膳</div>
-            <span class="logo-text">食养智脑</span>
+            <span class="logo-text">智能体质膳食推荐系统</span>
         </router-link>
 
         <nav class="nav">
