@@ -85,13 +85,12 @@
                     </div>
                     <div class="panel-body">
                         <div class="insight-content">
-                            <p class="insight-greeting">
-                                根据您的<strong>{{ constitutionName }}</strong>体质，结合当前<strong>霜降</strong>节气，为您精选以下食养方案：
-                            </p>
+                            <p class="insight-greeting" v-html="currentInsight.greeting"></p>
                             <ul class="insight-list">
-                                <li><span class="insight-tag warm">宜</span>温补脾胃，可多食山药、红枣、桂圆</li>
-                                <li><span class="insight-tag warm">宜</span>润燥养阴，推荐银耳、百合、雪梨</li>
-                                <li><span class="insight-tag cold">忌</span>生冷寒凉，少食西瓜、苦瓜等</li>
+                                <li v-for="(tip, index) in currentInsight.tips" :key="index">
+                                    <span class="insight-tag" :class="tip.tag">{{ tip.tag === 'warm' ? '宜' : '忌' }}</span>
+                                    {{ tip.text }}
+                                </li>
                             </ul>
                         </div>
                         <button class="refresh-insight-btn" @click="refreshInsight">
@@ -150,9 +149,30 @@
                     </div>
                     <div class="panel-body">
                         <div class="tip-carousel">
-                            <div class="tip-item active">
-                                <p>"霜降时节，天气渐寒，宜早睡早起，避免熬夜损耗阳气。"</p>
-                                <span class="tip-source">— 《黄帝内经》</span>
+                            <div class="tip-item">
+                                <p>{{ currentTip.text }}</p>
+                                <span class="tip-source">{{ currentTip.source }}</span>
+                            </div>
+                            <div class="tip-controls">
+                                <button class="tip-nav-btn" @click="prevTip" :disabled="healthTips.length <= 1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6" />
+                                    </svg>
+                                </button>
+                                <div class="tip-indicators">
+                                    <span 
+                                        v-for="(tip, index) in healthTips" 
+                                        :key="index" 
+                                        class="tip-dot" 
+                                        :class="{ active: index === currentTipIndex }"
+                                        @click="currentTipIndex = index"
+                                    ></span>
+                                </div>
+                                <button class="tip-nav-btn" @click="nextTip" :disabled="healthTips.length <= 1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -162,6 +182,9 @@
 
         <!-- 菜谱详情弹窗 -->
         <RecipeModal :visible="modalVisible" :recipe="selectedRecipe" @close="closeRecipeModal" />
+
+        <!-- 移动端底部导航 -->
+        <MobileNav />
     </div>
 </template>
 
@@ -173,6 +196,7 @@ import { usePreferenceStore } from '../stores/preference.js';
 import SearchFilter from '../components/recipe/SearchFilter.vue';
 import RecipeCard from '../components/recipe/RecipeCard.vue';
 import RecipeModal from '../components/recipe/RecipeModal.vue';
+import MobileNav from '../components/MobileNav.vue';
 
 // Stores
 const recipeStore = useRecipeStore();
@@ -276,6 +300,55 @@ const fiveElements = ref([
     { name: '咸 · 水', value: 50, color: 'var(--flavor-salty, #3b82f6)' }
 ]);
 
+// AI 洞察内容库（硬编码）
+const aiInsights = [
+    {
+        greeting: '根据您的<strong>平和质</strong>体质，结合当前<strong>大雪</strong>节气，为您精选以下食养方案：',
+        tips: [
+            { tag: 'warm', text: '温补脾胃，可多食山药、红枣、桂圆' },
+            { tag: 'warm', text: '润燥养阴，推荐银耳、百合、雪梨' },
+            { tag: 'cold', text: '生冷寒凉，少食西瓜、苦瓜等' }
+        ]
+    },
+    {
+        greeting: '寒冷冬季，您的<strong>平和质</strong>体质需要注意保暖和温补：',
+        tips: [
+            { tag: 'warm', text: '多食温热食材，如羊肉、牛肉、生姜' },
+            { tag: 'warm', text: '适量进补，黑芝麻、核桃有助益肾' },
+            { tag: 'cold', text: '避免过食生冷，减少寒性水果摄入' }
+        ]
+    },
+    {
+        greeting: '您的体质适合以下<strong>冬季养生</strong>方案：',
+        tips: [
+            { tag: 'warm', text: '早餐宜温热，推荐小米粥、红枣粥' },
+            { tag: 'warm', text: '午餐可食炖汤，萝卜牛腩汤最佳' },
+            { tag: 'cold', text: '晚餐宜清淡，忌油腻辛辣食物' }
+        ]
+    }
+];
+
+// 养生贴士内容库（硬编码）
+const healthTips = [
+    {
+        text: '"大雪时节，天气渐寒，宜早睡早起，避免熬夜损耗阳气。"',
+        source: '— 《黄帝内经》'
+    },
+    {
+        text: '"冬藏精气，少食寒凉，多食温补，以顺四时之气。"',
+        source: '— 《素问·四气调神大论》'
+    },
+    {
+        text: '"冬三月，此谓闭藏，水冰地坼，无扰乎阳。"',
+        source: '— 《黄帝内经》'
+    }
+];
+
+// 当前 AI 洞察索引
+const currentInsightIndex = ref(0);
+// 当前养生贴士索引
+const currentTipIndex = ref(0);
+
 // 方法
 const onSearch = (keyword) => {
     recipeStore.search(keyword);
@@ -308,8 +381,22 @@ const closeRecipeModal = () => {
 };
 
 const refreshInsight = () => {
-    alert('AI洞察功能开发中，敬请期待！');
+    currentInsightIndex.value = (currentInsightIndex.value + 1) % aiInsights.length;
 };
+
+const nextTip = () => {
+    currentTipIndex.value = (currentTipIndex.value + 1) % healthTips.length;
+};
+
+const prevTip = () => {
+    currentTipIndex.value = (currentTipIndex.value - 1 + healthTips.length) % healthTips.length;
+};
+
+// 计算属性：当前 AI 洞察
+const currentInsight = computed(() => aiInsights[currentInsightIndex.value]);
+
+// 计算属性：当前养生贴士
+const currentTip = computed(() => healthTips[currentTipIndex.value]);
 
 // 初始化
 onMounted(async () => {
@@ -334,11 +421,13 @@ onMounted(async () => {
 .status-summary {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-6);
     padding: var(--space-4) var(--space-6);
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
+    background: linear-gradient(135deg, var(--bg-white-alpha-70), var(--bg-white-alpha-50));
+    border: 1px solid var(--border-white);
     border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
     margin-bottom: var(--space-6);
     flex-wrap: wrap;
 }
@@ -394,7 +483,7 @@ onMounted(async () => {
 /* 两栏布局 */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: 1fr 380px;
     gap: var(--space-6);
 }
 
@@ -405,8 +494,8 @@ onMounted(async () => {
 
 .recipe-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-5);
     margin-bottom: var(--space-6);
 }
 
@@ -501,11 +590,18 @@ onMounted(async () => {
 }
 
 .panel-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    background: var(--bg-white-alpha-70);
+    border: 1px solid var(--border-white);
+    border-radius: var(--radius-xl);
     overflow: hidden;
+    backdrop-filter: blur(16px);
+    animation: slideInRight 0.5s ease backwards;
 }
+
+.panel-card:nth-child(1) { animation-delay: 0.1s; }
+.panel-card:nth-child(2) { animation-delay: 0.2s; }
+.panel-card:nth-child(3) { animation-delay: 0.3s; }
+.panel-card:nth-child(4) { animation-delay: 0.4s; }
 
 .panel-header {
     display: flex;
@@ -666,8 +762,13 @@ onMounted(async () => {
 }
 
 /* 养生贴士 */
+.tip-carousel {
+    position: relative;
+}
+
 .tip-item {
     text-align: center;
+    padding: var(--space-2) 0;
 }
 
 .tip-item p {
@@ -683,14 +784,91 @@ onMounted(async () => {
     color: var(--text-tertiary);
 }
 
+.tip-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+}
+
+.tip-nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.tip-nav-btn:hover:not(:disabled) {
+    color: var(--gold-primary);
+    background: var(--bg-secondary);
+}
+
+.tip-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.tip-indicators {
+    display: flex;
+    gap: 6px;
+}
+
+.tip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-light);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.tip-dot:hover {
+    background: var(--gold-light);
+}
+
+.tip-dot.active {
+    background: var(--gold-primary);
+    width: 20px;
+    border-radius: 3px;
+}
+
 /* 响应式 */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 340px;
+    }
+}
+
+@media (max-width: 992px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
 
     .analysis-panel {
-        order: 2;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-5);
+    }
+}
+
+@media (max-width: 768px) {
+    .recommendation-page {
+        padding-bottom: calc(var(--space-16) + env(safe-area-inset-bottom));
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analysis-panel {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -747,6 +925,18 @@ onMounted(async () => {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 </style>

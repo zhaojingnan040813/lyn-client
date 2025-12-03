@@ -19,6 +19,8 @@
     --bg-white-alpha-70: rgba(255, 255, 255, 0.7);
     --bg-white-alpha-50: rgba(255, 255, 255, 0.5);
     --bg-ink: #2C2C2C;
+    --bg-card: #FEFCF8;           /* 卡片背景 - 略乳白 */
+    --bg-secondary: #F9F5EF;      /* 次级背景色 */
 
     /* ===== 功能色 - 寒/热 ===== */
     --cold: #4A6FA5;              /* 靛蓝 - Indigo (寒性) */

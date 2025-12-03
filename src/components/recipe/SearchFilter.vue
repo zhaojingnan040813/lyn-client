@@ -89,7 +89,8 @@ const onTabClick = (key) => {
 <style scoped>
 .search-filter-bar {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: var(--space-4);
     margin-bottom: var(--space-6);
 }
@@ -98,6 +99,7 @@ const onTabClick = (key) => {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 .search-icon {
@@ -173,6 +175,17 @@ const onTabClick = (key) => {
     background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
     color: white;
     border-color: var(--gold-primary);
+}
+
+@media (max-width: 768px) {
+    .search-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        width: 100%;
+    }
 }
 
 @media (max-width: 640px) {

@@ -53,19 +53,21 @@ const meridianText = computed(() => {
 
 <style scoped>
 .recipe-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    background: var(--bg-white-alpha-70);
+    border: 1px solid var(--border-white);
+    border-radius: var(--radius-xl);
     overflow: hidden;
     cursor: pointer;
     transition: all var(--transition-normal);
     animation: fadeInUp 0.5s ease-out both;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
 }
 
 .recipe-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--gold-primary);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--gold);
 }
 
 .recipe-card-image {
