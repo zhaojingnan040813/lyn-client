@@ -17,16 +17,25 @@
                     <span class="flavor-value">{{ localValues[key] }}</span>
                 </div>
                 <div class="slider-wrapper">
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        :value="localValues[key]"
-                        class="flavor-slider"
-                        :style="{ '--slider-color': config.color }"
-                        @input="onSliderInput(key, $event)"
-                        @change="onSliderChange(key, $event)"
-                    />
+                    <div class="slider-track-container">
+                        <div class="slider-ticks">
+                            <span class="tick" data-value="0"></span>
+                            <span class="tick" data-value="25"></span>
+                            <span class="tick" data-value="50"></span>
+                            <span class="tick" data-value="75"></span>
+                            <span class="tick" data-value="100"></span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            :value="localValues[key]"
+                            class="flavor-slider"
+                            :style="{ '--slider-color': config.color }"
+                            @input="onSliderInput(key, $event)"
+                            @change="onSliderChange(key, $event)"
+                        />
+                    </div>
                     <div class="slider-labels">
                         <span>不喜欢</span>
                         <span>一般</span>
@@ -160,46 +169,99 @@ onMounted(() => {
     width: 100%;
 }
 
+.slider-track-container {
+    position: relative;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.slider-ticks {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tick {
+    position: relative;
+    width: 2px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 1px;
+}
+
+.tick::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+
 .flavor-slider {
+    position: relative;
     width: 100%;
     height: 8px;
     -webkit-appearance: none;
     appearance: none;
     background: linear-gradient(
         to right,
-        var(--bg-tertiary) 0%,
+        #e0e0e0 0%,
         var(--slider-color, var(--primary)) 100%
     );
+    border: 2px solid rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     outline: none;
     cursor: pointer;
+    z-index: 2;
 }
 
 .flavor-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background: white;
-    border: 3px solid var(--slider-color, var(--primary));
+    border: 4px solid var(--slider-color, var(--primary));
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 3;
 }
 
 .flavor-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--slider-color, var(--primary));
+}
+
+.flavor-slider::-webkit-slider-thumb:active {
+    transform: scale(1.05);
 }
 
 .flavor-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background: white;
-    border: 3px solid var(--slider-color, var(--primary));
+    border: 4px solid var(--slider-color, var(--primary));
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.flavor-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
 }
 
 .slider-labels {
