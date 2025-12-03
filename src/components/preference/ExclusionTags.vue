@@ -98,10 +98,12 @@ const removeIngredient = async (ingredient) => {
 
 <style scoped>
 .exclusion-tags-container {
-    background: var(--bg-primary);
-    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
     padding: var(--space-6);
-    border: 1px solid var(--border-light);
 }
 
 .section-header {
