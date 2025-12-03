@@ -68,8 +68,34 @@ export const constitutionApi = {
     }
 };
 
+/**
+ * 菜谱相关API
+ */
+export const recipeApi = {
+    // 获取菜谱列表
+    getRecipes(params = {}) {
+        return request.get('/recipes', { params });
+    },
+
+    // 获取菜谱详情
+    getRecipeById(id) {
+        return request.get(`/recipes/${id}`);
+    },
+
+    // 获取推荐菜谱
+    getRecommendedRecipes(limit = 6) {
+        return request.get('/recipes/recommend', { params: { limit } });
+    },
+
+    // 获取菜谱分类统计
+    getCategories() {
+        return request.get('/recipes/categories');
+    }
+};
+
 export default {
     sessionApi,
     preferenceApi,
-    constitutionApi
+    constitutionApi,
+    recipeApi
 };
