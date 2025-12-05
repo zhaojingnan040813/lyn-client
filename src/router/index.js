@@ -31,6 +31,14 @@ const routes = [
         }
     },
     {
+        path: '/chat',
+        name: 'Chat',
+        component: () => import('../views/ChatView.vue'),
+        meta: {
+            title: 'AI 问诊 - 智膳'
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('../views/NotFoundView.vue'),
