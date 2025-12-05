@@ -26,6 +26,14 @@
                     <option value="热">热</option>
                 </select>
 
+                <select v-model="filters.category" @change="handleSearch" class="filter-select">
+                    <option value="">全部分类</option>
+                    <option value="warming">温补</option>
+                    <option value="cooling">清润</option>
+                    <option value="neutral">平和</option>
+                    <option value="quick">快手</option>
+                </select>
+
                 <select v-model="filters.isActive" @change="handleSearch" class="filter-select">
                     <option value="">全部状态</option>
                     <option value="true">已启用</option>
@@ -91,6 +99,7 @@ const pagination = ref({
 const searchKeyword = ref('');
 const filters = ref({
     nature: '',
+    category: '',
     isActive: ''
 });
 
@@ -115,16 +124,22 @@ const loadRecipes = async () => {
             keyword: searchKeyword.value
         };
 
-        // 添加筛选条件
+        // 添加分类筛选
+        if (filters.value.category) {
+            params.category = filters.value.category;
+        }
+
+        // 添加性味筛选
         if (filters.value.nature) {
-            // 根据性味筛选，暂时通过关键词搜索实现
-            params.keyword = (params.keyword ? params.keyword + ' ' : '') + filters.value.nature;
+            params.nature = filters.value.nature;
         }
 
         const response = await recipeApi.getRecipes(params);
         
-        // 根据启用状态筛选
+        // 前端筛选（仅状态）
         let recipeList = response.data.list || [];
+        
+        // 根据启用状态筛选
         if (filters.value.isActive !== '') {
             const isActive = filters.value.isActive === 'true';
             recipeList = recipeList.filter(recipe => recipe.isActive === isActive);
