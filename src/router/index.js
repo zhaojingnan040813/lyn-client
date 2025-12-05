@@ -39,6 +39,22 @@ const routes = [
         }
     },
     {
+        path: '/admin',
+        name: 'Admin',
+        component: () => import('../views/AdminView.vue'),
+        meta: {
+            title: '管理后台 - 智膳'
+        }
+    },
+    {
+        path: '/ai-generate',
+        name: 'AIGenerate',
+        component: () => import('../views/AIGenerateView.vue'),
+        meta: {
+            title: 'AI菜谱生成器 - 智膳'
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('../views/NotFoundView.vue'),

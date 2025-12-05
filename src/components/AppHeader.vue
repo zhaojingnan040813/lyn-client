@@ -18,6 +18,9 @@
             <router-link to="/recommendation" class="nav-item" :class="{ active: currentRoute === 'Recommendation' }">
                 智膳推荐
             </router-link>
+            <router-link to="/admin" class="nav-item" :class="{ active: currentRoute === 'Admin' }">
+                管理后台
+            </router-link>
         </nav>
 
         <div class="header-right">
