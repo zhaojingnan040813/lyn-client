@@ -39,6 +39,14 @@ const routes = [
         }
     },
     {
+        path: '/admin',
+        name: 'Admin',
+        component: () => import('../views/AdminView.vue'),
+        meta: {
+            title: '管理后台 - 智膳'
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('../views/NotFoundView.vue'),

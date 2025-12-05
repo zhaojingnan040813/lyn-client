@@ -37,6 +37,31 @@ export const recipeApi = {
      */
     getCategories() {
         return request.get('/recipes/categories');
+    },
+
+    /**
+     * 创建新菜谱
+     * @param {Object} data - 菜谱数据
+     */
+    createRecipe(data) {
+        return request.post('/recipes', data);
+    },
+
+    /**
+     * 更新菜谱
+     * @param {string} id - 菜谱ID
+     * @param {Object} data - 菜谱数据
+     */
+    updateRecipe(id, data) {
+        return request.put(`/recipes/${id}`, data);
+    },
+
+    /**
+     * 删除菜谱
+     * @param {string} id - 菜谱ID
+     */
+    deleteRecipe(id) {
+        return request.delete(`/recipes/${id}`);
     }
 };
 
