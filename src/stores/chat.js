@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { sendMessage, sendMessageStream } from '@/api/chat.js';
+import { sendMessage, sendMessageStream } from '../api/chat.js';
 
 export const useChatStore = defineStore('chat', () => {
     // 聊天消息列表
