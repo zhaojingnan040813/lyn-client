@@ -269,7 +269,7 @@ onMounted(() => {
     justify-content: space-between;
     margin-top: var(--space-2);
     font-size: var(--text-xs);
-    color: var(--text-tertiary);
+    /* color: var(--text-tertiary); */
 }
 
 /* 响应式 */
