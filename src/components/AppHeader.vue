@@ -6,6 +6,9 @@
         </router-link>
 
         <nav class="nav">
+            <router-link to="/chat" class="nav-item" :class="{ active: currentRoute === 'Chat' }">
+                AI 问诊
+            </router-link>
             <router-link to="/constitution" class="nav-item" :class="{ active: currentRoute === 'Constitution' }">
                 体质诊断
             </router-link>

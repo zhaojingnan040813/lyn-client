@@ -17,9 +17,9 @@
                     <span class="tab-icon">🎯</span>
                     手动选择体质
                 </button>
-                <button class="tab-btn" :class="{ active: activeTab === 'ai' }" @click="activeTab = 'ai'" disabled>
+                <button class="tab-btn" @click="goToChat">
                     <span class="tab-icon">🤖</span>
-                    AI问诊（开发中）
+                    AI问诊
                 </button>
             </div>
 
@@ -117,9 +117,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
 import { constitutionApi } from '../api';
 
+const router = useRouter();
 const userStore = useUserStore();
 
 // 状态
@@ -178,6 +180,11 @@ const confirmSelection = async () => {
     } finally {
         saving.value = false;
     }
+};
+
+// 跳转到 AI 问诊页面
+const goToChat = () => {
+    router.push('/chat');
 };
 </script>
 
