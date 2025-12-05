@@ -208,15 +208,16 @@
 }
 
 .btn-gold {
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: var(--text-inverse);
+    /* background: linear-gradient(135deg, var(--gold), var(--gold-light)); */
+    background: var(--gold);
+    /* color: var(--text-inverse); */
     box-shadow: var(--shadow-sm);
 }
 
-.btn-gold:hover {
+/* .btn-gold:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-gold);
-}
+} */
 
 .btn-outline {
     background: transparent;

@@ -171,9 +171,9 @@ const onStartCooking = () => {
 }
 
 .modal-content {
-    background: var(--bg-primary);
+    background: white;
     border-radius: var(--radius-xl);
-    max-width: 600px;
+    max-width: 80%;
     width: 100%;
     max-height: 90vh;
     overflow: hidden;
@@ -453,15 +453,15 @@ const onStartCooking = () => {
 
 .btn-gold {
     flex: 1;
-    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    /* background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); */
     border: none;
-    color: white;
+    /* color: white; */
 }
 
-.btn-gold:hover {
+/* .btn-gold:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3);
-}
+} */
 
 /* 过渡动画 */
 .modal-enter-active,
