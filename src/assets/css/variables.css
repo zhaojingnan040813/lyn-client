@@ -7,6 +7,7 @@
     /* ===== 主色调 ===== */
     --primary: #7BA8A8;           /* 汝窑青 - Ru Kiln Cyan */
     --primary-light: #9DC5C5;
+    --primary-lighter: #B5DEDE;   /* 更浅的主色 - Lighter Primary */
     --primary-dark: #5A8787;
     --primary-alpha-10: rgba(123, 168, 168, 0.1);
     --primary-alpha-20: rgba(123, 168, 168, 0.2);
@@ -20,7 +21,9 @@
     --bg-white-alpha-50: rgba(255, 255, 255, 0.5);
     --bg-ink: #2C2C2C;
     --bg-card: #FEFCF8;           /* 卡片背景 - 略乳白 */
+    --bg-primary: #E8F4F4;        /* 主色相关的浅背景 - Primary Tinted Background */
     --bg-secondary: #F9F5EF;      /* 次级背景色 */
+    --bg-tertiary: #F3F0EA;       /* 第三级背景色 - Tertiary Background */
 
     /* ===== 功能色 - 寒/热 ===== */
     --cold: #4A6FA5;              /* 靛蓝 - Indigo (寒性) */
@@ -56,6 +59,7 @@
     --text-secondary: #666666;
     --text-muted: #999999;
     --text-light: #CCCCCC;
+    --text-tertiary: #DDDDDD;     /* 第三级文本色 - Tertiary Text */
     --text-inverse: #FFFFFF;
 
     /* ===== 边框 ===== */
