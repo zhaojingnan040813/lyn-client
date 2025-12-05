@@ -62,7 +62,37 @@ export const recipeApi = {
      */
     deleteRecipe(id) {
         return request.delete(`/recipes/${id}`);
+    },
+
+    /**
+     * AI生成菜谱
+     * @param {Object} data - 生成参数
+     * @param {string} data.foodName - 食品名称
+     */
+    generateRecipeByAI(data) {
+        return request.post('/recipes/generate', data);
+    },
+
+    /**
+     * 保存AI生成的菜谱
+     * @param {Object} data - 菜谱数据
+     */
+    saveAIGeneratedRecipe(data) {
+        return request.post('/recipes/save-generated', data);
     }
 };
 
 export default recipeApi;
+
+// 导出单独的函数以便直接使用
+export const {
+    getRecipes,
+    getRecipeById,
+    getRecommendedRecipes,
+    getCategories,
+    createRecipe,
+    updateRecipe,
+    deleteRecipe,
+    generateRecipeByAI,
+    saveAIGeneratedRecipe
+} = recipeApi;

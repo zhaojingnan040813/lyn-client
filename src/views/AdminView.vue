@@ -42,6 +42,9 @@
             </div>
 
             <div class="toolbar-right">
+                <button class="btn-ai-generate" @click="handleAIGenerate">
+                    🤖 AI生成
+                </button>
                 <button class="btn-create" @click="handleCreate">
                     <span>+</span> 新增菜谱
                 </button>
@@ -71,6 +74,13 @@
             @submit="handleSubmitForm"
         />
 
+        <!-- AI生成菜谱弹窗 -->
+        <AIRecipeGenerator 
+            :visible="aiGeneratorVisible"
+            @close="handleCloseAIGenerator"
+            @success="handleAIGeneratorSuccess"
+        />
+
         <!-- 消息提示 -->
         <div v-if="message.show" class="message" :class="message.type">
             {{ message.text }}
@@ -80,9 +90,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import RecipeTable from '../components/admin/RecipeTable.vue';
 import RecipeForm from '../components/admin/RecipeForm.vue';
+import AIRecipeGenerator from '../components/admin/AIRecipeGenerator.vue';
 import recipeApi from '../api/recipe.js';
+
+const router = useRouter();
 
 // 菜谱列表
 const recipes = ref([]);
@@ -106,6 +120,9 @@ const filters = ref({
 // 表单状态
 const formVisible = ref(false);
 const currentRecipe = ref(null);
+
+// AI生成器状态
+const aiGeneratorVisible = ref(false);
 
 // 消息提示
 const message = ref({
@@ -211,6 +228,21 @@ const handleSubmitForm = async (formData) => {
         console.error('保存菜谱失败:', error);
         showMessage(error.response?.data?.message || '保存菜谱失败', 'error');
     }
+};
+
+// AI生成相关方法
+const handleAIGenerate = () => {
+    console.log('AI生成按钮被点击');
+    router.push('/ai-generate');
+};
+
+const handleCloseAIGenerator = () => {
+    aiGeneratorVisible.value = false;
+};
+
+const handleAIGeneratorSuccess = (message) => {
+    showMessage(message, 'success');
+    loadRecipes(); // 重新加载菜谱列表
 };
 
 // 显示消息
@@ -333,6 +365,23 @@ onMounted(() => {
 
 .btn-create:hover {
     opacity: 0.9;
+}
+
+.btn-ai-generate {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-ai-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .btn-create span {
