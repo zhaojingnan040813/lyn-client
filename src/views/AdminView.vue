@@ -134,18 +134,14 @@ const loadRecipes = async () => {
             params.nature = filters.value.nature;
         }
 
-        const response = await recipeApi.getRecipes(params);
-        
-        // 前端筛选（仅状态）
-        let recipeList = response.data.list || [];
-        
-        // 根据启用状态筛选
+        // 添加启用状态筛选
         if (filters.value.isActive !== '') {
-            const isActive = filters.value.isActive === 'true';
-            recipeList = recipeList.filter(recipe => recipe.isActive === isActive);
+            params.isActive = filters.value.isActive;
         }
 
-        recipes.value = recipeList;
+        const response = await recipeApi.getRecipes(params);
+        
+        recipes.value = response.data.list || [];
         pagination.value = response.data.pagination;
     } catch (error) {
         console.error('加载菜谱失败:', error);
