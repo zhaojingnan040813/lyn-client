@@ -47,7 +47,22 @@
                   </div>
                 </div>
                 <div class="card-footer">
-                  <el-button type="primary" size="small" text>查看详情 →</el-button>
+                  <el-button
+                    type="primary"
+                    size="small"
+                    text
+                    @click.stop="viewConstitutionDetail(constitution.type)"
+                  >
+                    查看详情 →
+                  </el-button>
+                  <el-button
+                    type="success"
+                    size="small"
+                    @click.stop="setMyConstitution(constitution)"
+                    :loading="constitution.loading"
+                  >
+                    设置成我的体质
+                  </el-button>
                 </div>
               </el-card>
             </el-col>
@@ -168,6 +183,10 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { constitutionApi } from '../api/index.js'
+import { useUserStore } from '../stores/user.js'
+
+// 使用用户store
+const userStore = useUserStore()
 
 // 响应式数据
 const loading = ref(false)
@@ -227,6 +246,28 @@ const viewConstitutionDetail = async type => {
   } catch (error) {
     console.error('获取体质详情失败:', error)
     ElMessage.error('获取体质详情失败，请稍后重试')
+  }
+}
+
+// 设置成我的体质
+const setMyConstitution = async constitution => {
+  try {
+    // 设置该体质卡片的加载状态
+    constitution.loading = true
+
+    const success = await userStore.setConstitution(constitution.type, 'manual')
+
+    if (success) {
+      ElMessage.success(`已成功设置您的体质为：${constitution.name}`)
+    } else {
+      ElMessage.error('设置体质失败，请稍后重试')
+    }
+  } catch (error) {
+    console.error('设置体质失败:', error)
+    ElMessage.error('设置体质失败，请稍后重试')
+  } finally {
+    // 移除该体质卡片的加载状态
+    constitution.loading = false
   }
 }
 
@@ -340,6 +381,10 @@ onMounted(() => {
   text-align: center;
   padding: 15px 20px;
   border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* 详情对话框样式 */
