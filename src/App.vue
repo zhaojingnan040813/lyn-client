@@ -63,7 +63,20 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { Bowl, ChatDotRound, UserFilled, Operation, Star, Menu } from '@element-plus/icons-vue'
+import { useUserStore } from './stores/user'
+
+const userStore = useUserStore()
+
+// 应用启动时初始化会话
+onMounted(async () => {
+  try {
+    await userStore.initSession()
+  } catch (error) {
+    console.error('Failed to initialize session:', error)
+  }
+})
 </script>
 
 <style>
