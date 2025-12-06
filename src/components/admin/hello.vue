@@ -5,5 +5,4 @@
     <p class="hello-description">Welcome to the admin dashboard.</p>
   </div>
 </template>
-<script setup>
-</script>
+<script setup></script>

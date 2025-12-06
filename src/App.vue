@@ -1,21 +1,6 @@
-<template>
+<template></template>
 
-    
-
-    
-</template>
-
-<script setup>
-
-
-
-
-
-
-
-
-</script>
-
+<script setup></script>
 
 <style>
 /* 全局样式 */
@@ -34,7 +19,4 @@
   --mouse-x: 0.5;
   --mouse-y: 0.5;
 }
-
-
-
 </style>
