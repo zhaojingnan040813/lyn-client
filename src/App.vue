@@ -4,11 +4,6 @@
       <!-- 顶部导航栏 -->
       <el-header class="app-header">
         <div class="header-content">
-          <!-- <div class="logo">
-            <el-icon size="28" color="#409eff"><Bowl /></el-icon>
-            <span class="logo-text">智膳</span>
-          </div> -->
-
           <el-menu
             :default-active="$route.path"
             mode="horizontal"
@@ -37,13 +32,6 @@
               <span>菜品管理</span>
             </el-menu-item>
           </el-menu>
-
-          <!-- <div class="header-actions">
-            <el-avatar
-              :size="35"
-              src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-            />
-          </div> -->
         </div>
       </el-header>
 
@@ -55,7 +43,7 @@
       <!-- 底部 -->
       <el-footer class="app-footer">
         <div class="footer-content">
-          <p>&copy; 2026 智膳 - 智能体质膳食推荐系统. All rights reserved.齐齐哈尔医学院</p>
+          <p>&copy; 2026 智膳 - 智能体质膳食推荐系统.齐齐哈尔医学院</p>
         </div>
       </el-footer>
     </el-container>
@@ -114,47 +102,6 @@ onMounted(async () => {
   padding: 0 20px;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
-}
-
-.logo-text {
-  color: white;
-}
-
-.nav-menu {
-  background: transparent;
-  border: none;
-  flex: 1;
-  justify-content: center;
-}
-
-.nav-menu .el-menu-item {
-  color: rgba(255, 255, 255, 0.8);
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s;
-}
-
-.nav-menu .el-menu-item:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-menu .el-menu-item.is-active {
-  color: white;
-  background: rgba(255, 255, 255, 0.15);
-  border-bottom-color: white;
-}
-
-.nav-menu .el-menu-item .el-icon {
-  margin-right: 5px;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
@@ -183,29 +130,5 @@ onMounted(async () => {
 .footer-content p {
   margin: 0;
   opacity: 0.8;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  .nav-menu {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-  }
-
-  .header-actions {
-    order: 2;
-  }
-
-  .logo {
-    order: 1;
-    margin-bottom: 10px;
-  }
 }
 </style>
