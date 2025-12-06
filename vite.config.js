@@ -10,6 +10,7 @@ export default defineConfig({
     plugins: [
         vue(),
         tailwindcss(),
+        // 配置了 Element Plus 的按需引入，自动导入
         AutoImport({
             resolvers: [ElementPlusResolver()],
         }),
