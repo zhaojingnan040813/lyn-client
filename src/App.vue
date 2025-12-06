@@ -1,11 +1,128 @@
 <template>
-  <div id="app">
-    <router-view />
+  <div id="app" class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="container mx-auto px-4 py-8">
+      <!-- 头部标题 -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+          Tailwind CSS 测试页面
+        </h1>
+        <p class="text-lg text-gray-600">欢迎使用 Vue 3 + Element Plus + Tailwind CSS 应用</p>
+      </header>
+
+      <!-- 卡片展示区域 -->
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <!-- 颜色测试卡片 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 transform transition-transform duration-200 hover:scale-105">
+          <h2 class="text-xl font-semibold text-blue-600 mb-3">颜色测试</h2>
+          <div class="space-y-2">
+            <div class="h-8 bg-red-500 rounded"></div>
+            <div class="h-8 bg-green-500 rounded"></div>
+            <div class="h-8 bg-blue-500 rounded"></div>
+            <div class="h-8 bg-purple-500 rounded"></div>
+          </div>
+        </div>
+
+        <!-- 字体测试卡片 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 transform transition-transform duration-200 hover:scale-105">
+          <h2 class="text-xl font-semibold text-green-600 mb-3">字体测试</h2>
+          <div class="space-y-2">
+            <p class="text-sm font-light">Light 文本</p>
+            <p class="text-base font-normal">Normal 文本</p>
+            <p class="text-lg font-medium">Medium 文本</p>
+            <p class="text-xl font-bold">Bold 文本</p>
+          </div>
+        </div>
+
+        <!-- 布局测试卡片 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 transform transition-transform duration-200 hover:scale-105">
+          <h2 class="text-xl font-semibold text-purple-600 mb-3">布局测试</h2>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="h-12 bg-gray-200 rounded flex items-center justify-center text-xs">1</div>
+            <div class="h-12 bg-gray-300 rounded flex items-center justify-center text-xs">2</div>
+            <div class="h-12 bg-gray-400 rounded flex items-center justify-center text-xs">3</div>
+            <div class="h-12 bg-gray-500 rounded flex items-center justify-center text-xs text-white">4</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 按钮测试区域 -->
+      <section class="flex flex-wrap gap-4 justify-center mb-12">
+        <button class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-md">
+          主要按钮
+        </button>
+        <button class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 shadow-md">
+          成功按钮
+        </button>
+        <button class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors duration-200 shadow-md">
+          警告按钮
+        </button>
+        <button class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-md">
+          危险按钮
+        </button>
+      </section>
+
+      <!-- 表单测试区域 -->
+      <section class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">表单测试</h2>
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+            <input 
+              type="text" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              placeholder="请输入用户名"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+            <input 
+              type="email" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              placeholder="请输入邮箱"
+            />
+          </div>
+          <button 
+            type="submit" 
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
+          >
+            提交表单
+          </button>
+        </form>
+      </section>
+
+      <!-- 响应式测试 -->
+      <section class="mt-12 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">响应式测试</h2>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1 bg-blue-100 p-4 rounded text-center">
+            <span class="sm:hidden">移动端显示</span>
+            <span class="hidden sm:inline lg:hidden">平板显示</span>
+            <span class="hidden lg:inline">桌面端显示</span>
+          </div>
+          <div class="flex-1 bg-green-100 p-4 rounded text-center">
+            <span class="text-xs sm:text-sm lg:text-base">响应式字体大小</span>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <script setup>
-// 应用初始化逻辑可以在这里添加
+// Tailwind CSS 测试脚本
+console.log('Tailwind CSS 已成功加载！')
+
+// 可以添加一些交互逻辑
+const handleMouseMove = (event) => {
+  const x = event.clientX / window.innerWidth
+  const y = event.clientY / window.innerHeight
+  document.documentElement.style.setProperty('--mouse-x', x.toString())
+  document.documentElement.style.setProperty('--mouse-y', y.toString())
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('mousemove', handleMouseMove)
+}
 </script>
 
 <style>
@@ -16,194 +133,32 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol';
-  font-size: 14px;
-  line-height: 1.6;
-  color: #2c3e50;
-  background-color: #f5f5f5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 #app {
   min-height: 100vh;
 }
 
-/* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* 自定义CSS变量用于动态效果 */
+:root {
+  --mouse-x: 0.5;
+  --mouse-y: 0.5;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+/* 添加一些高级的CSS效果来配合Tailwind */
+.bg-gradient-to-br {
+  background: linear-gradient(
+    to bottom right,
+    rgb(239 246 255),
+    rgb(224 231 255)
+  );
 }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+/* 鼠标跟随效果（可选） */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+.transform:hover {
+  animation: float 2s ease-in-out infinite;
 }
-
-/* Element Plus 样式覆盖 */
-.el-button {
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-.el-button--primary {
-  background-color: #667eea;
-  border-color: #667eea;
-}
-
-.el-button--primary:hover {
-  background-color: #5a67d8;
-  border-color: #5a67d8;
-}
-
-.el-card {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.el-input__wrapper {
-  border-radius: 8px;
-}
-
-.el-textarea__inner {
-  border-radius: 8px;
-}
-
-.el-tag {
-  border-radius: 6px;
-  border: none;
-}
-
-.el-progress-bar__outer {
-  border-radius: 4px;
-}
-
-.el-progress-bar__inner {
-  border-radius: 4px;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  body {
-    font-size: 13px;
-  }
-}
-
-/* 动画类 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-
-/* 工具类 */
-.text-center {
-  text-align: center;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.h-full {
-  height: 100%;
-}
-
-.mt-1 { margin-top: 4px; }
-.mt-2 { margin-top: 8px; }
-.mt-3 { margin-top: 12px; }
-.mt-4 { margin-top: 16px; }
-.mt-5 { margin-top: 20px; }
-
-.mb-1 { margin-bottom: 4px; }
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
-.mb-4 { margin-bottom: 16px; }
-.mb-5 { margin-bottom: 20px; }
-
-.ml-1 { margin-left: 4px; }
-.ml-2 { margin-left: 8px; }
-.ml-3 { margin-left: 12px; }
-.ml-4 { margin-left: 16px; }
-.ml-5 { margin-left: 20px; }
-
-.mr-1 { margin-right: 4px; }
-.mr-2 { margin-right: 8px; }
-.mr-3 { margin-right: 12px; }
-.mr-4 { margin-right: 16px; }
-.mr-5 { margin-right: 20px; }
-
-.p-1 { padding: 4px; }
-.p-2 { padding: 8px; }
-.p-3 { padding: 12px; }
-.p-4 { padding: 16px; }
-.p-5 { padding: 20px; }
-
-.px-1 { padding-left: 4px; padding-right: 4px; }
-.px-2 { padding-left: 8px; padding-right: 8px; }
-.px-3 { padding-left: 12px; padding-right: 12px; }
-.px-4 { padding-left: 16px; padding-right: 16px; }
-.px-5 { padding-left: 20px; padding-right: 20px; }
-
-.py-1 { padding-top: 4px; padding-bottom: 4px; }
-.py-2 { padding-top: 8px; padding-bottom: 8px; }
-.py-3 { padding-top: 12px; padding-bottom: 12px; }
-.py-4 { padding-top: 16px; padding-bottom: 16px; }
-.py-5 { padding-top: 20px; padding-bottom: 20px; }
 </style>

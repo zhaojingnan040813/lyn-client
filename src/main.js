@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import router from './router';
 import App from './App.vue';
 import 'element-plus/dist/index.css';
+import './style/style.css';
 
 // 创建Vue应用
 const app = createApp(App);
