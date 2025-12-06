@@ -28,15 +28,88 @@
               <el-skeleton :loading="!constitution" animated>
                 <template #default>
                   <div v-if="constitution" class="constitution-content">
-                    <el-descriptions :column="1" border>
-                      <el-descriptions-item label="体质类型">
-                        <el-tag type="primary" size="small">{{ constitution.type }}</el-tag>
+                    <!-- 体质类型和图标 -->
+                    <div class="constitution-type-header">
+                      <div
+                        class="constitution-icon"
+                        :style="{ color: constitution.constitutionInfo?.color || '#409eff' }"
+                      >
+                        {{ constitution.constitutionInfo?.icon || '👤' }}
+                      </div>
+                      <div class="constitution-info">
+                        <el-tag
+                          type="primary"
+                          size="large"
+                          :color="constitution.constitutionInfo?.color"
+                          effect="plain"
+                        >
+                          {{
+                            constitution.constitutionInfo?.name || constitution.constitution?.type
+                          }}
+                        </el-tag>
+                        <div class="diagnosis-info">
+                          <span class="diagnosis-method">
+                            {{ getDiagnosisMethodName(constitution.constitution?.diagnosisMethod) }}
+                          </span>
+                          <span class="diagnosis-time">
+                            {{ formatDate(constitution.constitution?.diagnosedAt) }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <el-divider />
+
+                    <el-descriptions :column="1" border size="small">
+                      <el-descriptions-item label="体质描述">
+                        <p class="description-text">
+                          {{ constitution.constitutionInfo?.description }}
+                        </p>
                       </el-descriptions-item>
+
                       <el-descriptions-item label="体质特征">
-                        <p class="description-text">{{ constitution.description }}</p>
+                        <div class="characteristics-list">
+                          <el-tag
+                            v-for="(characteristic, index) in constitution.constitutionInfo
+                              ?.characteristics"
+                            :key="index"
+                            type="info"
+                            size="small"
+                            class="characteristic-tag"
+                          >
+                            {{ characteristic }}
+                          </el-tag>
+                        </div>
                       </el-descriptions-item>
-                      <el-descriptions-item label="饮食建议">
-                        <p class="description-text">{{ constitution.dietaryAdvice }}</p>
+
+                      <el-descriptions-item label="推荐食材">
+                        <div class="ingredients-list">
+                          <el-tag
+                            v-for="(ingredient, index) in constitution.constitutionInfo
+                              ?.recommendedIngredients"
+                            :key="index"
+                            type="success"
+                            size="small"
+                            class="ingredient-tag recommended"
+                          >
+                            {{ ingredient }}
+                          </el-tag>
+                        </div>
+                      </el-descriptions-item>
+
+                      <el-descriptions-item label="避免食材">
+                        <div class="ingredients-list">
+                          <el-tag
+                            v-for="(ingredient, index) in constitution.constitutionInfo
+                              ?.dietaryGuidelines?.avoided"
+                            :key="index"
+                            type="danger"
+                            size="small"
+                            class="ingredient-tag avoided"
+                          >
+                            {{ ingredient }}
+                          </el-tag>
+                        </div>
                       </el-descriptions-item>
                     </el-descriptions>
                   </div>
@@ -569,6 +642,33 @@ const getDifficultyName = level => {
   return levels[level] || '未知'
 }
 
+// 获取诊断方法名称
+const getDiagnosisMethodName = method => {
+  const methods = {
+    manual: '人工诊断',
+    ai: 'AI诊断',
+    questionnaire: '问卷诊断'
+  }
+  return methods[method] || method
+}
+
+// 格式化日期
+const formatDate = dateStr => {
+  if (!dateStr) return '未知时间'
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return dateStr
+  }
+}
+
 // 添加项目
 const addItem = field => {
   formData.value[field].push('')
@@ -720,6 +820,67 @@ onMounted(() => {
   line-height: 1.6;
 }
 
+/* 体质类型头部样式 */
+.constitution-type-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.constitution-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.constitution-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagnosis-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.diagnosis-method {
+  font-weight: 500;
+}
+
+.diagnosis-time {
+  color: #c0c4cc;
+}
+
+/* 特征和食材标签样式 */
+.characteristics-list,
+.ingredients-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.characteristic-tag,
+.ingredient-tag {
+  margin: 0;
+}
+
+.ingredient-tag.recommended {
+  border-color: #67c23a;
+  background-color: #f0f9ff;
+  color: #67c23a;
+}
+
+.ingredient-tag.avoided {
+  border-color: #f56c6c;
+  background-color: #fef0f0;
+  color: #f56c6c;
+}
+
 .description-text {
   color: #606266;
   font-size: 14px;
@@ -774,11 +935,6 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 20px;
 }
-
-/* 样式穿刺给 el-form-item__content 这个元素加flex: 1; */
-/* :deep(.el-form-item__content) {
-  flex: 1;
-} */
 
 .slider-item {
   display: flex;
@@ -906,6 +1062,20 @@ onMounted(() => {
   :deep(.el-card__header),
   :deep(.el-card__body) {
     padding: 16px;
+  }
+
+  .constitution-type-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .constitution-icon {
+    font-size: 36px;
+  }
+
+  .diagnosis-info {
+    align-items: center;
   }
 }
 </style>
