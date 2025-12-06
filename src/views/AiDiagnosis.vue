@@ -1,55 +1,7 @@
 <template>
   <div class="ai-diagnosis">
     <el-container>
-      <el-header class="page-header">
-        <h1>AI问诊</h1>
-        <p>通过智能AI技术，为您提供个性化的健康问诊服务</p>
-      </el-header>
-
-      <el-main>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-card class="feature-card">
-              <template #header>
-                <div class="card-header">
-                  <el-icon><ChatDotRound /></el-icon>
-                  <span>症状描述</span>
-                </div>
-              </template>
-              <p>请详细描述您的身体状况和不适症状</p>
-              <el-button type="primary" plain>开始描述</el-button>
-            </el-card>
-          </el-col>
-
-          <el-col :span="8">
-            <el-card class="feature-card">
-              <template #header>
-                <div class="card-header">
-                  <el-icon><User /></el-icon>
-                  <span>健康档案</span>
-                </div>
-              </template>
-              <p>查看和管理您的个人健康档案信息</p>
-              <el-button type="primary" plain>查看档案</el-button>
-            </el-card>
-          </el-col>
-
-          <el-col :span="8">
-            <el-card class="feature-card">
-              <template #header>
-                <div class="card-header">
-                  <el-icon><Document /></el-icon>
-                  <span>问诊记录</span>
-                </div>
-              </template>
-              <p>查看历史问诊记录和诊断结果</p>
-              <el-button type="primary" plain>查看记录</el-button>
-            </el-card>
-          </el-col>
-        </el-row>
-
-        <el-divider content-position="left">AI问诊功能区</el-divider>
-
+      <el-main class="custom-main">
         <el-card class="chat-container">
           <template #header>
             <div class="chat-header">
@@ -76,10 +28,10 @@
             </div>
 
             <div class="message user-message">
+              <el-avatar :size="32">我</el-avatar>
               <div class="message-content">
                 <p>最近总是感觉很疲劳，睡眠质量也不太好...</p>
               </div>
-              <el-avatar :size="32">我</el-avatar>
             </div>
           </div>
 
@@ -92,7 +44,6 @@
               resize="none"
             />
             <div class="input-actions">
-              <el-button>上传图片</el-button>
               <el-button type="primary">发送</el-button>
             </div>
           </div>
@@ -110,42 +61,7 @@ const messageInput = ref('')
 </script>
 
 <style scoped>
-.ai-diagnosis {
-  padding: 20px;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.page-header h1 {
-  color: #409eff;
-  margin-bottom: 10px;
-}
-
-.page-header p {
-  color: #666;
-  font-size: 14px;
-}
-
-.feature-card {
-  margin-bottom: 20px;
-  height: 180px;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.card-header .el-icon {
-  color: #409eff;
-}
-
 .chat-container {
-  max-width: 800px;
   margin: 0 auto;
 }
 

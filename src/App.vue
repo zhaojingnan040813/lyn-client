@@ -55,7 +55,7 @@
       <!-- 底部 -->
       <el-footer class="app-footer">
         <div class="footer-content">
-          <p>&copy; 2024 智膳 - 智能体质膳食推荐系统. All rights reserved.</p>
+          <p>&copy; 2026 智膳 - 智能体质膳食推荐系统. All rights reserved.齐齐哈尔医学院</p>
         </div>
       </el-footer>
     </el-container>
