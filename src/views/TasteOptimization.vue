@@ -150,7 +150,8 @@
             <el-card>
               <template #header>
                 <div class="card-header">
-                  <el-icon><Potato /></el-icon>
+                  <!-- <el-icon><Potato /></el-icon> -->
+                  <el-icon><Setting /></el-icon>
                   <span>推荐菜品</span>
                 </div>
               </template>
@@ -213,7 +214,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Setting, FirstAidKit, DataAnalysis, Potato, EditPen } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 const tastePreference = ref({

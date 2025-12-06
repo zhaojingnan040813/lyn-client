@@ -1,340 +1,517 @@
 <template>
   <div class="constitution-diagnosis">
     <el-container>
-      <el-header class="page-header">
-        <h1>体质诊断</h1>
-        <p>通过专业问卷和智能分析，准确识别您的体质类型</p>
-      </el-header>
+      <el-main class="custom-main">
+        <!-- 页面标题 -->
+        <div class="page-header">
+          <h1>中医体质诊断</h1>
+          <p>了解您的体质类型，获得个性化的膳食建议</p>
+        </div>
 
-      <el-main>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-card class="diagnosis-card">
-              <template #header>
+        <!-- 体质列表 -->
+        <div class="constitution-list" v-loading="loading">
+          <el-row :gutter="20">
+            <el-col
+              :xs="24"
+              :sm="12"
+              :md="8"
+              :lg="6"
+              v-for="constitution in constitutions"
+              :key="constitution.type"
+            >
+              <el-card
+                class="constitution-card"
+                @click="viewConstitutionDetail(constitution.type)"
+                shadow="hover"
+              >
                 <div class="card-header">
-                  <el-icon><DocumentChecked /></el-icon>
-                  <span>体质测评问卷</span>
-                </div>
-              </template>
-
-              <el-steps :active="currentStep" finish-status="success" align-center>
-                <el-step title="基本信息" />
-                <el-step title="生活习惯" />
-                <el-step title="身体状况" />
-                <el-step title="心理状态" />
-                <el-step title="完成诊断" />
-              </el-steps>
-
-              <div class="question-container">
-                <div v-if="currentStep === 0" class="step-content">
-                  <h3>基本信息</h3>
-                  <el-form :model="basicInfo" label-width="120px">
-                    <el-form-item label="性别">
-                      <el-radio-group v-model="basicInfo.gender">
-                        <el-radio label="male">男</el-radio>
-                        <el-radio label="female">女</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="年龄">
-                      <el-input-number v-model="basicInfo.age" :min="1" :max="120" />
-                    </el-form-item>
-                    <el-form-item label="身高(cm)">
-                      <el-input-number v-model="basicInfo.height" :min="100" :max="250" />
-                    </el-form-item>
-                    <el-form-item label="体重(kg)">
-                      <el-input-number v-model="basicInfo.weight" :min="30" :max="200" />
-                    </el-form-item>
-                  </el-form>
-                </div>
-
-                <div v-else-if="currentStep === 1" class="step-content">
-                  <h3>生活习惯</h3>
-                  <div class="question-item">
-                    <p>您平时的睡眠质量如何？</p>
-                    <el-radio-group v-model="lifeHabits.sleep">
-                      <el-radio label="excellent">很好</el-radio>
-                      <el-radio label="good">较好</el-radio>
-                      <el-radio label="normal">一般</el-radio>
-                      <el-radio label="poor">较差</el-radio>
-                    </el-radio-group>
+                  <div
+                    class="constitution-icon"
+                    :style="{ backgroundColor: constitution.color || '#409EFF' }"
+                  >
+                    <span class="constitution-emoji">{{ constitution.icon }}</span>
                   </div>
-                  <div class="question-item">
-                    <p>您的运动频率是？</p>
-                    <el-radio-group v-model="lifeHabits.exercise">
-                      <el-radio label="daily">每天</el-radio>
-                      <el-radio label="weekly">每周3-4次</el-radio>
-                      <el-radio label="occasionally">偶尔</el-radio>
-                      <el-radio label="rarely">很少</el-radio>
-                    </el-radio-group>
+                  <h3>{{ constitution.name }}</h3>
+                </div>
+                <div class="card-content">
+                  <p class="constitution-desc">{{ constitution.description }}</p>
+                  <div class="characteristics">
+                    <el-tag
+                      v-for="char in constitution.characteristics?.slice(0, 3)"
+                      :key="char"
+                      size="small"
+                      type="info"
+                    >
+                      {{ char }}
+                    </el-tag>
                   </div>
                 </div>
-
-                <div v-else class="step-content">
-                  <h3>其他信息</h3>
-                  <p>该部分问卷正在开发中...</p>
+                <div class="card-footer">
+                  <el-button type="primary" size="small" text>查看详情 →</el-button>
                 </div>
-              </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
 
-              <div class="step-actions">
-                <el-button v-if="currentStep > 0" @click="prevStep">上一步</el-button>
-                <el-button type="primary" @click="nextStep">
-                  {{ currentStep === 4 ? '完成诊断' : '下一步' }}
-                </el-button>
-              </div>
-            </el-card>
-          </el-col>
-
-          <el-col :span="12">
-            <el-card class="result-card">
-              <template #header>
-                <div class="card-header">
-                  <el-icon><DataAnalysis /></el-icon>
-                  <span>体质类型说明</span>
-                </div>
-              </template>
-
-              <el-tabs v-model="activeTab" type="card">
-                <el-tab-pane label="平和质" name="balanced">
-                  <div class="constitution-info">
-                    <el-tag type="success" size="large">健康体质</el-tag>
-                    <h4>平和质特征</h4>
-                    <ul>
-                      <li>体型匀称健壮</li>
-                      <li>面色润泽，头发稠密有光泽</li>
-                      <li>精力充沛，睡眠良好</li>
-                      <li>性格随和开朗</li>
-                    </ul>
-                    <p class="suggestion">建议：保持良好的生活习惯，适度运动，均衡饮食。</p>
-                  </div>
-                </el-tab-pane>
-
-                <el-tab-pane label="气虚质" name="qi-deficiency">
-                  <div class="constitution-info">
-                    <el-tag type="warning" size="large">需调理体质</el-tag>
-                    <h4>气虚质特征</h4>
-                    <ul>
-                      <li>语音低弱，气短懒言</li>
-                      <li>容易疲乏，精神不振</li>
-                      <li>易出汗，舌淡红</li>
-                      <li>性格内向，不喜冒险</li>
-                    </ul>
-                    <p class="suggestion">建议：多食用补气健脾的食物，如山药、红枣、黄芪等。</p>
-                  </div>
-                </el-tab-pane>
-
-                <el-tab-pane label="阳虚质" name="yang-deficiency">
-                  <div class="constitution-info">
-                    <el-tag type="info" size="large">需温补体质</el-tag>
-                    <h4>阳虚质特征</h4>
-                    <ul>
-                      <li>畏寒怕冷，手足不温</li>
-                      <li>喜热饮食，精神不振</li>
-                      <li>面色苍白，舌淡胖嫩</li>
-                      <li>性格多沉静、内向</li>
-                    </ul>
-                    <p class="suggestion">建议：多食用温补食物，如羊肉、生姜、桂圆等。</p>
-                  </div>
-                </el-tab-pane>
-
-                <el-tab-pane label="阴虚质" name="yin-deficiency">
-                  <div class="constitution-info">
-                    <el-tag type="danger" size="large">需滋阴体质</el-tag>
-                    <h4>阴虚质特征</h4>
-                    <ul>
-                      <li>手足心热，口燥咽干</li>
-                      <li>喜冷饮，大便干燥</li>
-                      <li>面色潮红，舌红少津</li>
-                      <li>性情急躁，外向活泼</li>
-                    </ul>
-                    <p class="suggestion">建议：多食用滋阴润燥的食物，如银耳、百合、梨等。</p>
-                  </div>
-                </el-tab-pane>
-              </el-tabs>
-            </el-card>
-          </el-col>
-        </el-row>
-
-        <el-divider content-position="left">历史诊断记录</el-divider>
-
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <el-icon><Clock /></el-icon>
-              <span>诊断历史</span>
+        <!-- 体质详情对话框 -->
+        <el-dialog
+          v-model="detailDialogVisible"
+          :title="selectedConstitution?.name"
+          width="80%"
+          max-width="800px"
+          destroy-on-close
+        >
+          <div v-if="selectedConstitution" class="constitution-detail">
+            <!-- 基本信息 -->
+            <div class="detail-section">
+              <h3>体质介绍</h3>
+              <p class="description">{{ selectedConstitution.description }}</p>
             </div>
-          </template>
 
-          <el-table :data="diagnosisHistory" style="width: 100%">
-            <el-table-column prop="date" label="诊断日期" width="180" />
-            <el-table-column prop="constitution" label="体质类型" width="180">
-              <template #default="scope">
-                <el-tag :type="getConstitutionTagType(scope.row.constitution)">
-                  {{ scope.row.constitution }}
+            <!-- 体质特征 -->
+            <div class="detail-section">
+              <h3>体质特征</h3>
+              <div class="characteristics-list">
+                <el-tag
+                  v-for="char in selectedConstitution.characteristics"
+                  :key="char"
+                  class="characteristic-tag"
+                  size="medium"
+                >
+                  {{ char }}
                 </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="score" label="评分" width="120" />
-            <el-table-column prop="suggestion" label="主要建议" />
-            <el-table-column label="操作" width="120">
-              <template #default="scope">
-                <el-button link type="primary" size="small">查看详情</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
+              </div>
+            </div>
+
+            <!-- 推荐食材 -->
+            <div class="detail-section">
+              <h3>推荐食材</h3>
+              <div class="ingredients-grid">
+                <el-tag
+                  v-for="ingredient in selectedConstitution.recommendedIngredients"
+                  :key="ingredient"
+                  class="ingredient-tag"
+                  type="success"
+                  effect="light"
+                >
+                  {{ ingredient }}
+                </el-tag>
+              </div>
+            </div>
+
+            <!-- 口味偏好 -->
+            <div class="detail-section">
+              <h3>口味偏好</h3>
+              <div class="flavor-preference">
+                <div
+                  class="flavor-item"
+                  v-for="(value, key) in selectedConstitution.flavorPreference"
+                  :key="key"
+                >
+                  <span class="flavor-name">{{ getFlavorName(key) }}:</span>
+                  <el-rate
+                    :model-value="getFlavorScore(value)"
+                    disabled
+                    show-score
+                    text-color="#ff9900"
+                    score-template="{value}"
+                    :max="5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- 膳食指南 -->
+            <div class="detail-section">
+              <h3>膳食指南</h3>
+              <div class="dietary-guidelines">
+                <div class="guideline-section">
+                  <h4>
+                    <span class="indicator indicator-success">✓</span>
+                    推荐食物
+                  </h4>
+                  <ul>
+                    <li
+                      v-for="item in selectedConstitution.dietaryGuidelines.recommended"
+                      :key="item"
+                    >
+                      {{ item }}
+                    </li>
+                  </ul>
+                </div>
+                <div class="guideline-section">
+                  <h4>
+                    <span class="indicator indicator-danger">✗</span>
+                    避免食物
+                  </h4>
+                  <ul>
+                    <li v-for="item in selectedConstitution.dietaryGuidelines.avoided" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <template #footer>
+            <el-button @click="detailDialogVisible = false">关闭</el-button>
+          </template>
+        </el-dialog>
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { DocumentChecked, DataAnalysis, Clock } from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { constitutionApi } from '../api/index.js'
 
-const currentStep = ref(0)
-const activeTab = ref('balanced')
+// 响应式数据
+const loading = ref(false)
+const constitutions = ref([])
+const selectedConstitution = ref(null)
+const detailDialogVisible = ref(false)
 
-const basicInfo = ref({
-  gender: 'male',
-  age: 25,
-  height: 170,
-  weight: 65
+// 获取口味名称
+const getFlavorName = key => {
+  const flavorMap = {
+    sour: '酸',
+    sweet: '甜',
+    bitter: '苦',
+    spicy: '辣',
+    salty: '咸'
+  }
+  return flavorMap[key] || key
+}
+
+// 将API返回的口味数值转换为0-5的范围
+const getFlavorScore = value => {
+  // 假设API返回的值是20-80的范围，转换为0-5的范围
+  // 例如：20->0, 30->1, 40->2, 50->2.5, 60->3, 70->4, 80->5
+  return Math.round((value - 20) / 12)
+}
+
+// 获取所有体质类型
+const fetchConstitutions = async () => {
+  loading.value = true
+  try {
+    const response = await constitutionApi.getConstitutions()
+    console.log('体质列表响应:', response.data)
+    if (response.code === 0) {
+      constitutions.value = response.data.sort((a, b) => a.sortOrder - b.sortOrder)
+    } else {
+      ElMessage.error(response.message || '获取体质列表失败')
+    }
+  } catch (error) {
+    console.error('获取体质列表失败:', error)
+    ElMessage.error('获取体质列表失败，请稍后重试')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 查看体质详情
+const viewConstitutionDetail = async type => {
+  try {
+    const response = await constitutionApi.getConstitutionByType(type)
+    console.log('体质详情响应:', response)
+    if (response.code === 0) {
+      selectedConstitution.value = response.data
+      detailDialogVisible.value = true
+    } else {
+      ElMessage.error(response.message || '获取体质详情失败')
+    }
+  } catch (error) {
+    console.error('获取体质详情失败:', error)
+    ElMessage.error('获取体质详情失败，请稍后重试')
+  }
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  fetchConstitutions()
 })
-
-const lifeHabits = ref({
-  sleep: 'good',
-  exercise: 'weekly'
-})
-
-const diagnosisHistory = ref([
-  {
-    date: '2024-01-15',
-    constitution: '气虚质',
-    score: '78分',
-    suggestion: '建议多食用补气健脾食物，加强适度运动'
-  },
-  {
-    date: '2023-12-20',
-    constitution: '阳虚质',
-    score: '82分',
-    suggestion: '建议温补饮食，避免生冷食物'
-  }
-])
-
-const nextStep = () => {
-  if (currentStep.value < 4) {
-    currentStep.value++
-  }
-}
-
-const prevStep = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--
-  }
-}
-
-const getConstitutionTagType = constitution => {
-  const typeMap = {
-    平和质: 'success',
-    气虚质: 'warning',
-    阳虚质: 'info',
-    阴虚质: 'danger',
-    痰湿质: 'warning',
-    湿热质: 'danger'
-  }
-  return typeMap[constitution] || 'info'
-}
 </script>
 
 <style scoped>
 .constitution-diagnosis {
   padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
-  color: #409eff;
+  color: #303133;
   margin-bottom: 10px;
+  font-size: 2.5em;
 }
 
 .page-header p {
-  color: #666;
-  font-size: 14px;
+  color: #606266;
+  font-size: 1.1em;
+  margin: 0;
 }
 
-.diagnosis-card,
-.result-card {
+.constitution-list {
+  margin-bottom: 40px;
+}
+
+.constitution-card {
   margin-bottom: 20px;
-  height: 600px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.constitution-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
+  text-align: center;
+  padding: 20px 20px 10px;
+}
+
+.constitution-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  margin: 0 auto 15px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-size: 32px;
+  font-weight: bold;
 }
 
-.card-header .el-icon {
-  color: #409eff;
+.constitution-emoji {
+  font-size: 36px;
+  line-height: 1;
 }
 
-.question-container {
-  margin: 30px 0;
-  min-height: 300px;
+.card-header h3 {
+  margin: 0;
+  color: #303133;
+  font-size: 1.3em;
+  font-weight: 600;
 }
 
-.step-content {
-  padding: 20px;
+.card-content {
+  padding: 0 20px 15px;
 }
 
-.step-content h3 {
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.question-item {
-  margin-bottom: 25px;
-}
-
-.question-item p {
+.constitution-desc {
+  color: #606266;
+  font-size: 0.9em;
+  line-height: 1.6;
   margin-bottom: 15px;
-  font-weight: 500;
-  color: #555;
+  min-height: 60px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.step-actions {
+.characteristics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 32px;
+}
+
+.card-footer {
   text-align: center;
-  margin-top: 30px;
+  padding: 15px 20px;
+  border-top: 1px solid #f0f0f0;
 }
 
-.constitution-info {
-  padding: 15px;
+/* 详情对话框样式 */
+.constitution-detail {
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-.constitution-info h4 {
-  margin: 15px 0;
-  color: #333;
+.detail-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.constitution-info ul {
-  margin: 15px 0;
-  padding-left: 20px;
+.detail-section:last-child {
+  border-bottom: none;
 }
 
-.constitution-info li {
-  margin-bottom: 8px;
-  color: #666;
+.detail-section h3 {
+  color: #303133;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.suggestion {
-  background-color: #f0f9ff;
+.description {
+  color: #606266;
+  line-height: 1.8;
+  font-size: 1.05em;
+  background-color: #f8f9fa;
   padding: 15px;
   border-radius: 8px;
   border-left: 4px solid #409eff;
-  color: #333;
+}
+
+.characteristics-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.characteristic-tag {
+  margin: 0;
+  font-size: 0.9em;
+  padding: 8px 12px;
+}
+
+.ingredients-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ingredient-tag {
+  margin: 0;
+  font-size: 0.9em;
+  padding: 6px 10px;
+}
+
+.flavor-preference {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.flavor-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.flavor-name {
+  font-weight: 500;
+  color: #303133;
+  min-width: 40px;
+}
+
+.dietary-guidelines {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.guideline-section h4 {
+  color: #303133;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1em;
+}
+
+.indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+}
+
+.indicator-success {
+  background-color: #67c23a;
+}
+
+.indicator-danger {
+  background-color: #f56c6c;
+}
+
+.guideline-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.guideline-section li {
+  margin-bottom: 8px;
+  color: #606266;
+  line-height: 1.6;
+}
+
+.guideline-section li:last-child {
+  margin-bottom: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .constitution-diagnosis {
+    padding: 10px;
+  }
+
+  .page-header {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .page-header h1 {
+    font-size: 2em;
+  }
+
+  .dietary-guidelines {
+    grid-template-columns: 1fr;
+  }
+
+  .flavor-preference {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 滚动条样式 */
+.constitution-detail::-webkit-scrollbar {
+  width: 6px;
+}
+
+.constitution-detail::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.constitution-detail::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.constitution-detail::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>
