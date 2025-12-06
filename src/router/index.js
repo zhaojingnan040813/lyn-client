@@ -1,6 +1,51 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const routes = []
+const routes = [
+  {
+    path: '/',
+    redirect: '/ai-diagnosis'
+  },
+  {
+    path: '/ai-diagnosis',
+    name: 'AiDiagnosis',
+    component: () => import('../views/AiDiagnosis.vue'),
+    meta: {
+      title: 'AI问诊 - 智能体质膳食推荐系统'
+    }
+  },
+  {
+    path: '/constitution-diagnosis',
+    name: 'ConstitutionDiagnosis',
+    component: () => import('../views/ConstitutionDiagnosis.vue'),
+    meta: {
+      title: '体质诊断 - 智能体质膳食推荐系统'
+    }
+  },
+  {
+    path: '/taste-optimization',
+    name: 'TasteOptimization',
+    component: () => import('../views/TasteOptimization.vue'),
+    meta: {
+      title: '口味调优 - 智能体质膳食推荐系统'
+    }
+  },
+  {
+    path: '/recipe-recommendation',
+    name: 'RecipeRecommendation',
+    component: () => import('../views/RecipeRecommendation.vue'),
+    meta: {
+      title: '至膳推荐 - 智能体质膳食推荐系统'
+    }
+  },
+  {
+    path: '/dish-management',
+    name: 'DishManagement',
+    component: () => import('../views/DishManagement.vue'),
+    meta: {
+      title: '菜品管理 - 智能体质膳食推荐系统'
+    }
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(),
