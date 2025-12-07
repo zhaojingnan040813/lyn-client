@@ -444,6 +444,49 @@
           </div>
         </el-form-item>
 
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="适合体质" prop="suitableConstitutions">
+              <el-select
+                v-model="recipeForm.suitableConstitutions"
+                multiple
+                placeholder="选择适合的体质"
+                style="width: 100%"
+              >
+                <el-option label="平和质" value="balanced" />
+                <el-option label="气虚质" value="qi_deficiency" />
+                <el-option label="阳虚质" value="yang_deficiency" />
+                <el-option label="阴虚质" value="yin_deficiency" />
+                <el-option label="痰湿质" value="phlegm_dampness" />
+                <el-option label="湿热质" value="damp_heat" />
+                <el-option label="血瘀质" value="blood_stasis" />
+                <el-option label="气郁质" value="qi_stagnation" />
+                <el-option label="特禀质" value="special" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="禁忌体质" prop="avoidConstitutions">
+              <el-select
+                v-model="recipeForm.avoidConstitutions"
+                multiple
+                placeholder="选择禁忌的体质"
+                style="width: 100%"
+              >
+                <el-option label="平和质" value="balanced" />
+                <el-option label="气虚质" value="qi_deficiency" />
+                <el-option label="阳虚质" value="yang_deficiency" />
+                <el-option label="阴虚质" value="yin_deficiency" />
+                <el-option label="痰湿质" value="phlegm_dampness" />
+                <el-option label="湿热质" value="damp_heat" />
+                <el-option label="血瘀质" value="blood_stasis" />
+                <el-option label="气郁质" value="qi_stagnation" />
+                <el-option label="特禀质" value="special" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="启用状态">
           <el-switch v-model="recipeForm.isActive" />
         </el-form-item>
@@ -762,6 +805,8 @@ const recipeForm = reactive({
   tags: [],
   ingredients: [],
   steps: [],
+  suitableConstitutions: [],
+  avoidConstitutions: [],
   cookingTime: 30,
   difficulty: '中等',
   isActive: true
@@ -942,6 +987,8 @@ const resetForm = () => {
     tags: [],
     ingredients: [],
     steps: [],
+    suitableConstitutions: [],
+    avoidConstitutions: [],
     cookingTime: 30,
     difficulty: '中等',
     isActive: true
