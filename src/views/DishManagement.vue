@@ -35,7 +35,7 @@
             <el-button @click="handleReset">重置</el-button>
             <el-button type="success" @click="handleExport">导出</el-button>
             <el-button type="info" @click="showColumnSettings = true">列设置</el-button>
-            <el-button type="primary" @click="showCreateDialog = true" class="add-dish-btn">
+            <el-button type="primary" @click="handleAddDish" class="add-dish-btn">
               <el-icon><Plus /></el-icon>
               添加菜品
             </el-button>
@@ -835,6 +835,12 @@ const handleSizeChange = val => {
 const handleCurrentChange = val => {
   currentPage.value = val
   loadRecipes()
+}
+
+// 添加菜品
+const handleAddDish = () => {
+  resetForm()
+  showCreateDialog.value = true
 }
 
 // 查看详情
