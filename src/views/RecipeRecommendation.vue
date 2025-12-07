@@ -30,10 +30,16 @@
           </el-radio-button>
         </el-radio-group>
       </div>
-      <el-button type="success" :loading="loading" @click="loadRecommendations">
-        <el-icon v-if="!loading"><Refresh /></el-icon>
-        {{ loading ? '加载中...' : '刷新推荐' }}
-      </el-button>
+      <div class="action-buttons">
+        <el-button type="primary" @click="goToAiRecommend">
+          <el-icon><StarFilled /></el-icon>
+          AI智能推荐
+        </el-button>
+        <el-button type="success" :loading="loading" @click="loadRecommendations">
+          <el-icon v-if="!loading"><Refresh /></el-icon>
+          {{ loading ? '加载中...' : '刷新推荐' }}
+        </el-button>
+      </div>
     </div>
 
     <!-- 加载状态 -->
@@ -301,9 +307,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { recipeApi } from '@/api/recipe'
 import { ElMessage } from 'element-plus'
-import { Grid, List, Refresh, Loading, StarFilled } from '@element-plus/icons-vue'
+// import { Grid, List, Refresh, Loading, StarFilled, StarFilled } from '@element-plus/icons-vue'
+
+const router = useRouter()
 
 // 响应式数据
 const recipes = ref([])
@@ -390,6 +399,11 @@ const getNatureType = nature => {
   }
 }
 
+// 跳转到AI智能推荐页面
+const goToAiRecommend = () => {
+  router.push('/ai-recipe-recommend')
+}
+
 // 页面加载时获取推荐菜谱
 onMounted(() => {
   loadRecommendations()
@@ -441,6 +455,12 @@ onMounted(() => {
 
 .view-switch {
   display: flex;
+  align-items: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
   align-items: center;
 }
 
@@ -715,6 +735,12 @@ onMounted(() => {
   .action-bar {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .page-title {

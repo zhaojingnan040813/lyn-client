@@ -52,6 +52,14 @@ const routes = [
     meta: {
       title: 'AI添加菜品 - 智能体质膳食推荐系统'
     }
+  },
+  {
+    path: '/ai-recipe-recommend',
+    name: 'AiRecipeRecommend',
+    component: () => import('../views/AiRecipeRecommend.vue'),
+    meta: {
+      title: 'AI智能推荐 - 智能体质膳食推荐系统'
+    }
   }
 ]
 

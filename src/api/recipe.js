@@ -79,6 +79,18 @@ export const recipeApi = {
    */
   saveAIGeneratedRecipe(data) {
     return request.post('/recipes/save-generated', data)
+  },
+
+  /**
+   * AI智能推荐菜品
+   * @param {Object} data - 推荐参数
+   * @param {string} data.mealType - 用餐类型
+   * @param {number} data.count - 推荐数量
+   * @param {string[]} data.excludeIngredients - 排除食材
+   * @param {string} data.specialRequirements - 特殊要求
+   */
+  aiRecommendRecipes(data) {
+    return request.post('/recipes/ai-recommend', data)
   }
 }
 
@@ -94,5 +106,6 @@ export const {
   updateRecipe,
   deleteRecipe,
   generateRecipeByAI,
-  saveAIGeneratedRecipe
+  saveAIGeneratedRecipe,
+  aiRecommendRecipes
 } = recipeApi
