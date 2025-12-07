@@ -44,6 +44,14 @@ const routes = [
     meta: {
       title: '菜品管理 - 智能体质膳食推荐系统'
     }
+  },
+  {
+    path: '/ai-add-dish',
+    name: 'AiAddDish',
+    component: () => import('../views/AiAddDish.vue'),
+    meta: {
+      title: 'AI添加菜品 - 智能体质膳食推荐系统'
+    }
   }
 ]
 

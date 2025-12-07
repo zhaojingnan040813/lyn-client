@@ -37,7 +37,11 @@
             <el-button type="info" @click="showColumnSettings = true">列设置</el-button>
             <el-button type="primary" @click="handleAddDish" class="add-dish-btn">
               <el-icon><Plus /></el-icon>
-              添加菜品
+              手工添加菜品
+            </el-button>
+            <el-button type="success" @click="handleAiAddDish" class="ai-add-dish-btn">
+              <el-icon><Cpu /></el-icon>
+              AI添加菜品
             </el-button>
           </div>
         </el-col>
@@ -888,6 +892,12 @@ const handleAddDish = () => {
   showCreateDialog.value = true
 }
 
+// AI添加菜品
+const handleAiAddDish = () => {
+  // 在新标签页中打开AI添加菜品页面
+  window.open('/ai-add-dish', '_blank')
+}
+
 // 查看详情
 const handleView = row => {
   viewingRecipe.value = { ...row }
@@ -1392,5 +1402,15 @@ onMounted(() => {
 
 .add-dish-btn:hover {
   background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.ai-add-dish-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  font-weight: bold;
+}
+
+.ai-add-dish-btn:hover {
+  background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
 }
 </style>

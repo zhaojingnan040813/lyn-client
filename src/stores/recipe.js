@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { recipeApi } from '../api/index.js'
+import { recipeApi } from '../api/recipe.js'
 
 export const useRecipeStore = defineStore('recipe', () => {
   // ========== 状态 ==========
@@ -163,6 +163,58 @@ export const useRecipeStore = defineStore('recipe', () => {
     currentRecipe.value = null
   }
 
+  /**
+   * AI生成菜谱
+   * @param {Object} params - 生成参数
+   */
+  const generateRecipeByAI = async params => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await recipeApi.generateRecipeByAI(params)
+
+      if (response.code === 0) {
+        return response.data
+      } else {
+        throw new Error(response.message || 'AI生成菜谱失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('AI生成菜谱失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * 保存AI生成的菜谱
+   * @param {Object} data - 菜谱数据
+   */
+  const saveAIGeneratedRecipe = async data => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await recipeApi.saveAIGeneratedRecipe(data)
+
+      if (response.code === 0) {
+        // 保存成功后刷新菜谱列表
+        await fetchRecipes()
+        return response.data
+      } else {
+        throw new Error(response.message || '保存菜谱失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('保存菜谱失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // 状态
     recipes,
@@ -186,7 +238,9 @@ export const useRecipeStore = defineStore('recipe', () => {
     search,
     loadMore,
     reset,
-    clearCurrentRecipe
+    clearCurrentRecipe,
+    generateRecipeByAI,
+    saveAIGeneratedRecipe
   }
 })
 

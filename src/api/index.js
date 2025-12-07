@@ -90,6 +90,31 @@ export const recipeApi = {
   // 获取菜谱分类统计
   getCategories() {
     return request.get('/recipes/categories')
+  },
+
+  // 创建新菜谱
+  createRecipe(data) {
+    return request.post('/recipes', data)
+  },
+
+  // 更新菜谱
+  updateRecipe(id, data) {
+    return request.put(`/recipes/${id}`, data)
+  },
+
+  // 删除菜谱
+  deleteRecipe(id) {
+    return request.delete(`/recipes/${id}`)
+  },
+
+  // AI生成菜谱
+  generateRecipeByAI(data) {
+    return request.post('/recipes/generate', data)
+  },
+
+  // 保存AI生成的菜谱
+  saveAIGeneratedRecipe(data) {
+    return request.post('/recipes/save-generated', data)
   }
 }
 
