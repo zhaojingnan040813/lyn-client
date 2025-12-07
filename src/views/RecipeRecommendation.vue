@@ -401,7 +401,7 @@ const getNatureType = nature => {
 
 // 跳转到AI智能推荐页面
 const goToAiRecommend = () => {
-  router.push('/ai-recipe-recommend')
+  window.open(router.resolve('/ai-recipe-recommend').href, '_blank')
 }
 
 // 页面加载时获取推荐菜谱
