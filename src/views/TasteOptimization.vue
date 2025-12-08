@@ -236,36 +236,20 @@
                       <el-checkbox label="低脂" border>低脂</el-checkbox>
                       <el-checkbox label="无乳制品" border>无乳制品</el-checkbox>
                       <el-checkbox label="无坚果" border>无坚果</el-checkbox>
-                    </el-checkbox-group>
-                  </div>
-                  <el-divider content-position="left">自定义选项</el-divider>
-                  <div class="custom-options">
-                    <div
-                      v-for="(item, index) in customDietaryRestrictions"
-                      :key="index"
-                      class="list-item"
-                    >
-                      <el-input
-                        v-model="customDietaryRestrictions[index]"
-                        placeholder="请输入自定义饮食禁忌"
-                        clearable
+                      <el-checkbox
+                        v-for="(item, index) in customDietaryRestrictions"
+                        :key="index"
+                        :label="item"
+                        border
                       >
-                        <template #append>
-                          <el-button
-                            type="danger"
-                            icon="Delete"
-                            @click="removeCustomItem('customDietaryRestrictions', index)"
-                            text
-                          />
-                        </template>
-                      </el-input>
-                    </div>
+                        {{ item }}
+                      </el-checkbox>
+                    </el-checkbox-group>
                     <el-button
                       type="primary"
                       icon="Plus"
                       @click="addCustomItem('customDietaryRestrictions')"
                       plain
-                      size="small"
                     >
                       添加自定义禁忌
                     </el-button>
@@ -287,32 +271,20 @@
                       <el-checkbox label="小麦" border>小麦</el-checkbox>
                       <el-checkbox label="芝麻" border>芝麻</el-checkbox>
                       <el-checkbox label="贝类" border>贝类</el-checkbox>
-                    </el-checkbox-group>
-                  </div>
-                  <el-divider content-position="left">自定义选项</el-divider>
-                  <div class="custom-options">
-                    <div v-for="(item, index) in customAllergies" :key="index" class="list-item">
-                      <el-input
-                        v-model="customAllergies[index]"
-                        placeholder="请输入自定义过敏原"
-                        clearable
+                      <el-checkbox
+                        v-for="(item, index) in customAllergies"
+                        :key="index"
+                        :label="item"
+                        border
                       >
-                        <template #append>
-                          <el-button
-                            type="danger"
-                            icon="Delete"
-                            @click="removeCustomItem('customAllergies', index)"
-                            text
-                          />
-                        </template>
-                      </el-input>
-                    </div>
+                        {{ item }}
+                      </el-checkbox>
+                    </el-checkbox-group>
                     <el-button
                       type="warning"
                       icon="Plus"
                       @click="addCustomItem('customAllergies')"
                       plain
-                      size="small"
                     >
                       添加自定义过敏原
                     </el-button>
@@ -338,36 +310,20 @@
                       <el-checkbox label="木耳" border>木耳</el-checkbox>
                       <el-checkbox label="香菇" border>香菇</el-checkbox>
                       <el-checkbox label="豆腐" border>豆腐</el-checkbox>
-                    </el-checkbox-group>
-                  </div>
-                  <el-divider content-position="left">自定义选项</el-divider>
-                  <div class="custom-options">
-                    <div
-                      v-for="(item, index) in customDislikedIngredients"
-                      :key="index"
-                      class="list-item"
-                    >
-                      <el-input
-                        v-model="customDislikedIngredients[index]"
-                        placeholder="请输入不喜欢的食材"
-                        clearable
+                      <el-checkbox
+                        v-for="(item, index) in customDislikedIngredients"
+                        :key="index"
+                        :label="item"
+                        border
                       >
-                        <template #append>
-                          <el-button
-                            type="danger"
-                            icon="Delete"
-                            @click="removeCustomItem('customDislikedIngredients', index)"
-                            text
-                          />
-                        </template>
-                      </el-input>
-                    </div>
+                        {{ item }}
+                      </el-checkbox>
+                    </el-checkbox-group>
                     <el-button
                       type="info"
                       icon="Plus"
                       @click="addCustomItem('customDislikedIngredients')"
                       plain
-                      size="small"
                     >
                       添加自定义食材
                     </el-button>
@@ -393,36 +349,20 @@
                       <el-checkbox label="食欲不振" border>食欲不振</el-checkbox>
                       <el-checkbox label="口干舌燥" border>口干舌燥</el-checkbox>
                       <el-checkbox label="面色苍白" border>面色苍白</el-checkbox>
-                    </el-checkbox-group>
-                  </div>
-                  <el-divider content-position="left">自定义选项</el-divider>
-                  <div class="custom-options">
-                    <div
-                      v-for="(item, index) in customCurrentConditions"
-                      :key="index"
-                      class="list-item"
-                    >
-                      <el-input
-                        v-model="customCurrentConditions[index]"
-                        placeholder="请输入当前身体状态"
-                        clearable
+                      <el-checkbox
+                        v-for="(item, index) in customCurrentConditions"
+                        :key="index"
+                        :label="item"
+                        border
                       >
-                        <template #append>
-                          <el-button
-                            type="danger"
-                            icon="Delete"
-                            @click="removeCustomItem('customCurrentConditions', index)"
-                            text
-                          />
-                        </template>
-                      </el-input>
-                    </div>
+                        {{ item }}
+                      </el-checkbox>
+                    </el-checkbox-group>
                     <el-button
                       type="success"
                       icon="Plus"
                       @click="addCustomItem('customCurrentConditions')"
                       plain
-                      size="small"
                     >
                       添加自定义状态
                     </el-button>
@@ -448,36 +388,20 @@
                       <el-checkbox label="一人食" border>一人食</el-checkbox>
                       <el-checkbox label="约会" border>约会</el-checkbox>
                       <el-checkbox label="运动后" border>运动后</el-checkbox>
-                    </el-checkbox-group>
-                  </div>
-                  <el-divider content-position="left">自定义选项</el-divider>
-                  <div class="custom-options">
-                    <div
-                      v-for="(item, index) in customMealScenarios"
-                      :key="index"
-                      class="list-item"
-                    >
-                      <el-input
-                        v-model="customMealScenarios[index]"
-                        placeholder="请输入用餐场景"
-                        clearable
+                      <el-checkbox
+                        v-for="(item, index) in customMealScenarios"
+                        :key="index"
+                        :label="item"
+                        border
                       >
-                        <template #append>
-                          <el-button
-                            type="danger"
-                            icon="Delete"
-                            @click="removeCustomItem('customMealScenarios', index)"
-                            text
-                          />
-                        </template>
-                      </el-input>
-                    </div>
+                        {{ item }}
+                      </el-checkbox>
+                    </el-checkbox-group>
                     <el-button
                       type="primary"
                       icon="Plus"
                       @click="addCustomItem('customMealScenarios')"
                       plain
-                      size="small"
                     >
                       添加自定义场景
                     </el-button>
@@ -680,16 +604,42 @@ const removeItem = (field, index) => {
 }
 
 // 添加自定义项目
-const addCustomItem = field => {
-  const fieldMap = {
-    customDietaryRestrictions: customDietaryRestrictions,
-    customAllergies: customAllergies,
-    customDislikedIngredients: customDislikedIngredients,
-    customCurrentConditions: customCurrentConditions,
-    customMealScenarios: customMealScenarios
+const addCustomItem = async field => {
+  const fieldTitles = {
+    customDietaryRestrictions: '饮食禁忌',
+    customAllergies: '过敏原',
+    customDislikedIngredients: '不喜欢的食材',
+    customCurrentConditions: '身体状态',
+    customMealScenarios: '用餐场景'
   }
 
-  fieldMap[field].value.push('')
+  try {
+    const { value } = await ElMessageBox.prompt(
+      `请输入自定义${fieldTitles[field]}`,
+      '添加自定义选项',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^.{1,20}$/,
+        inputErrorMessage: '输入内容不能为空，且不超过20个字符'
+      }
+    )
+
+    if (value && value.trim()) {
+      const fieldMap = {
+        customDietaryRestrictions: customDietaryRestrictions,
+        customAllergies: customAllergies,
+        customDislikedIngredients: customDislikedIngredients,
+        customCurrentConditions: customCurrentConditions,
+        customMealScenarios: customMealScenarios
+      }
+
+      fieldMap[field].value.push(value.trim())
+      ElMessage.success('添加成功！')
+    }
+  } catch {
+    // 用户取消操作或输入无效
+  }
 }
 
 // 删除自定义项目
@@ -981,6 +931,11 @@ onMounted(() => {
   width: 100%;
 }
 
+.preset-options .el-button {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
 .section-label {
   color: #606266;
   font-weight: 500;
@@ -995,6 +950,33 @@ onMounted(() => {
   gap: 12px;
   width: 100%;
   margin-top: 8px;
+}
+
+.custom-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.custom-checkbox-item .el-checkbox {
+  margin-right: 8px;
+}
+
+.custom-checkbox-item .delete-btn {
+  margin-left: auto;
+}
+
+:deep(.el-checkbox-group) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+:deep(.el-checkbox.is-bordered) {
+  margin-right: 0;
+  margin-bottom: 8px;
 }
 
 :deep(.el-checkbox-group) {
