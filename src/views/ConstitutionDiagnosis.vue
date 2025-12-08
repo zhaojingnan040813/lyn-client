@@ -2,25 +2,18 @@
   <div class="constitution-diagnosis">
     <el-container>
       <el-main class="custom-main">
-        <!-- 页面标题 -->
-        <div class="page-header">
-          <h1>中医体质诊断</h1>
-          <p>了解您的体质类型，获得个性化的膳食建议</p>
-        </div>
-
-        <!-- 体质列表 -->
-        <div class="constitution-list" v-loading="loading">
-          <el-row :gutter="20">
-            <el-col
-              :xs="24"
-              :sm="12"
-              :md="8"
-              :lg="6"
-              v-for="constitution in constitutions"
-              :key="constitution.type"
-            >
+        <div class="layout-container">
+          <!-- 左侧体质列表 -->
+          <div class="constitution-list-panel" v-loading="loading">
+            <div class="panel-header">
+              <h2>体质类型</h2>
+            </div>
+            <div class="constitution-list">
               <el-card
+                v-for="constitution in constitutions"
+                :key="constitution.type"
                 class="constitution-card"
+                :class="{ active: selectedConstitution?.type === constitution.type }"
                 @click="viewConstitutionDetail(constitution.type)"
                 shadow="hover"
               >
@@ -49,131 +42,141 @@
                 <div class="card-footer">
                   <el-button
                     type="primary"
-                    size="small"
-                    text
-                    @click.stop="viewConstitutionDetail(constitution.type)"
-                  >
-                    查看详情 →
-                  </el-button>
-                  <el-button
-                    type="success"
-                    size="small"
+                    size="default"
                     @click.stop="setMyConstitution(constitution)"
                     :loading="constitution.loading"
+                    class="set-constitution-btn"
                   >
+                    <span class="btn-icon">💝</span>
                     设置成我的体质
                   </el-button>
                 </div>
               </el-card>
-            </el-col>
-          </el-row>
-        </div>
-
-        <!-- 体质详情对话框 -->
-        <el-dialog
-          v-model="detailDialogVisible"
-          :title="selectedConstitution?.name"
-          width="80%"
-          max-width="800px"
-          destroy-on-close
-        >
-          <div v-if="selectedConstitution" class="constitution-detail">
-            <!-- 基本信息 -->
-            <div class="detail-section">
-              <h3>体质介绍</h3>
-              <p class="description">{{ selectedConstitution.description }}</p>
-            </div>
-
-            <!-- 体质特征 -->
-            <div class="detail-section">
-              <h3>体质特征</h3>
-              <div class="characteristics-list">
-                <el-tag
-                  v-for="char in selectedConstitution.characteristics"
-                  :key="char"
-                  class="characteristic-tag"
-                  size="medium"
-                >
-                  {{ char }}
-                </el-tag>
-              </div>
-            </div>
-
-            <!-- 推荐食材 -->
-            <div class="detail-section">
-              <h3>推荐食材</h3>
-              <div class="ingredients-grid">
-                <el-tag
-                  v-for="ingredient in selectedConstitution.recommendedIngredients"
-                  :key="ingredient"
-                  class="ingredient-tag"
-                  type="success"
-                  effect="light"
-                >
-                  {{ ingredient }}
-                </el-tag>
-              </div>
-            </div>
-
-            <!-- 口味偏好 -->
-            <div class="detail-section">
-              <h3>口味偏好</h3>
-              <div class="flavor-preference">
-                <div
-                  class="flavor-item"
-                  v-for="(value, key) in selectedConstitution.flavorPreference"
-                  :key="key"
-                >
-                  <span class="flavor-name">{{ getFlavorName(key) }}:</span>
-                  <el-rate
-                    :model-value="getFlavorScore(value)"
-                    disabled
-                    show-score
-                    text-color="#ff9900"
-                    score-template="{value}"
-                    :max="5"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- 膳食指南 -->
-            <div class="detail-section">
-              <h3>膳食指南</h3>
-              <div class="dietary-guidelines">
-                <div class="guideline-section">
-                  <h4>
-                    <span class="indicator indicator-success">✓</span>
-                    推荐食物
-                  </h4>
-                  <ul>
-                    <li
-                      v-for="item in selectedConstitution.dietaryGuidelines.recommended"
-                      :key="item"
-                    >
-                      {{ item }}
-                    </li>
-                  </ul>
-                </div>
-                <div class="guideline-section">
-                  <h4>
-                    <span class="indicator indicator-danger">✗</span>
-                    避免食物
-                  </h4>
-                  <ul>
-                    <li v-for="item in selectedConstitution.dietaryGuidelines.avoided" :key="item">
-                      {{ item }}
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
           </div>
 
-          <template #footer>
-            <el-button @click="detailDialogVisible = false">关闭</el-button>
-          </template>
-        </el-dialog>
+          <!-- 右侧详情区域 -->
+          <div class="detail-panel">
+            <div v-if="selectedConstitution" class="constitution-detail">
+              <!-- 详情头部 -->
+              <div class="detail-header">
+                <div
+                  class="detail-icon"
+                  :style="{ backgroundColor: selectedConstitution.color || '#409EFF' }"
+                >
+                  <span class="detail-emoji">{{ selectedConstitution.icon }}</span>
+                </div>
+                <div class="detail-title">
+                  <h2>{{ selectedConstitution.name }}</h2>
+                  <p>{{ selectedConstitution.description }}</p>
+                </div>
+              </div>
+
+              <!-- 基本信息 -->
+              <div class="detail-section">
+                <h3>体质介绍</h3>
+                <p class="description">{{ selectedConstitution.description }}</p>
+              </div>
+
+              <!-- 体质特征 -->
+              <div class="detail-section">
+                <h3>体质特征</h3>
+                <div class="characteristics-list">
+                  <el-tag
+                    v-for="char in selectedConstitution.characteristics"
+                    :key="char"
+                    class="characteristic-tag"
+                    size="medium"
+                  >
+                    {{ char }}
+                  </el-tag>
+                </div>
+              </div>
+
+              <!-- 推荐食材 -->
+              <div class="detail-section">
+                <h3>推荐食材</h3>
+                <div class="ingredients-grid">
+                  <el-tag
+                    v-for="ingredient in selectedConstitution.recommendedIngredients"
+                    :key="ingredient"
+                    class="ingredient-tag"
+                    type="success"
+                    effect="light"
+                  >
+                    {{ ingredient }}
+                  </el-tag>
+                </div>
+              </div>
+
+              <!-- 口味偏好 -->
+              <div class="detail-section">
+                <h3>口味偏好</h3>
+                <div class="flavor-preference">
+                  <div
+                    class="flavor-item"
+                    v-for="(value, key) in selectedConstitution.flavorPreference"
+                    :key="key"
+                  >
+                    <span class="flavor-name">{{ getFlavorName(key) }}:</span>
+                    <el-rate
+                      :model-value="getFlavorScore(value)"
+                      disabled
+                      show-score
+                      text-color="#ff9900"
+                      score-template="{value}"
+                      :max="5"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 膳食指南 -->
+              <div class="detail-section">
+                <h3>膳食指南</h3>
+                <div class="dietary-guidelines">
+                  <div class="guideline-section">
+                    <h4>
+                      <span class="indicator indicator-success">✓</span>
+                      推荐食物
+                    </h4>
+                    <ul>
+                      <li
+                        v-for="item in selectedConstitution.dietaryGuidelines.recommended"
+                        :key="item"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="guideline-section">
+                    <h4>
+                      <span class="indicator indicator-danger">✗</span>
+                      避免食物
+                    </h4>
+                    <ul>
+                      <li
+                        v-for="item in selectedConstitution.dietaryGuidelines.avoided"
+                        :key="item"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 未选中体质时的占位提示 -->
+            <div v-else class="detail-placeholder">
+              <div class="placeholder-content">
+                <div class="placeholder-icon">📋</div>
+                <h3>请选择一个体质类型</h3>
+                <p>点击左侧的体质卡片查看详细信息</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </el-main>
     </el-container>
   </div>
@@ -192,7 +195,6 @@ const userStore = useUserStore()
 const loading = ref(false)
 const constitutions = ref([])
 const selectedConstitution = ref(null)
-const detailDialogVisible = ref(false)
 
 // 获取口味名称
 const getFlavorName = key => {
@@ -239,7 +241,6 @@ const viewConstitutionDetail = async type => {
     console.log('体质详情响应:', response)
     if (response.code === 0) {
       selectedConstitution.value = response.data
-      detailDialogVisible.value = true
     } else {
       ElMessage.error(response.message || '获取体质详情失败')
     }
@@ -284,29 +285,141 @@ onMounted(() => {
   min-height: 100vh;
 }
 
-.page-header {
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 20px;
+.layout-container {
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 40px);
+}
+
+/* 左侧体质列表面板 */
+.constitution-list-panel {
+  flex: 0 0 25%;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.page-header h1 {
-  color: #303133;
-  margin-bottom: 10px;
-  font-size: 2.5em;
+.panel-header {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, #409eff 0%, #0056b3 100%);
+  color: white;
 }
 
-.page-header p {
-  color: #606266;
-  font-size: 1.1em;
+.panel-header h2 {
   margin: 0;
+  font-size: 1.3em;
+  font-weight: 600;
 }
 
 .constitution-list {
-  margin-bottom: 40px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.constitution-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.constitution-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.constitution-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.constitution-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 右侧详情面板 */
+.detail-panel {
+  flex: 0 0 calc(75% - 20px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 详情头部样式 */
+.detail-header {
+  padding: 30px;
+  background: linear-gradient(135deg, #409eff 0%, #0056b3 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-radius: 12px 12px 0 0;
+}
+
+.detail-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.detail-emoji {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.detail-title h2 {
+  margin: 0 0 10px 0;
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.detail-title p {
+  margin: 0;
+  font-size: 1.1em;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* 占位提示样式 */
+.detail-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #909399;
+}
+
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.placeholder-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.3em;
+  color: #606266;
+}
+
+.placeholder-content p {
+  margin: 0;
+  font-size: 1em;
+  color: #909399;
 }
 
 .constitution-card {
@@ -316,11 +429,21 @@ onMounted(() => {
   border: none;
   border-radius: 12px;
   overflow: hidden;
+  border: 2px solid transparent;
 }
 
 .constitution-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.constitution-card.active {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+.constitution-card.active .constitution-icon {
+  transform: scale(1.1);
 }
 
 .card-header {
@@ -378,19 +501,71 @@ onMounted(() => {
 }
 
 .card-footer {
-  text-align: center;
   padding: 15px 20px;
   border-top: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
-/* 详情对话框样式 */
+/* 设置体质按钮样式 */
+.set-constitution-btn {
+  width: 100%;
+  height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+}
+
+.set-constitution-btn:hover {
+  background: linear-gradient(135deg, #ee5a24 0%, #ff6b6b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+}
+
+.set-constitution-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(238, 90, 36, 0.3);
+}
+
+.set-constitution-btn .btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.set-constitution-btn.is-loading {
+  background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
+}
+
+/* 详情内容样式 */
 .constitution-detail {
-  max-height: 70vh;
+  flex: 1;
   overflow-y: auto;
+  padding: 30px;
+}
+
+.constitution-detail::-webkit-scrollbar {
+  width: 6px;
+}
+
+.constitution-detail::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.constitution-detail::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.constitution-detail::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .detail-section {
@@ -523,13 +698,54 @@ onMounted(() => {
     padding: 10px;
   }
 
-  .page-header {
-    padding: 15px;
-    margin-bottom: 20px;
+  .layout-container {
+    flex-direction: column;
+    height: auto;
+    gap: 15px;
   }
 
-  .page-header h1 {
-    font-size: 2em;
+  .constitution-list-panel {
+    flex: none;
+    width: 100%;
+    max-height: 300px;
+  }
+
+  .detail-panel {
+    flex: none;
+    width: 100%;
+    min-height: 400px;
+  }
+
+  .detail-header {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .detail-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .detail-emoji {
+    font-size: 36px;
+  }
+
+  .detail-title h2 {
+    font-size: 1.5em;
+  }
+
+  .detail-title p {
+    font-size: 1em;
+  }
+
+  .constitution-detail {
+    padding: 20px;
+  }
+
+  .detail-section {
+    margin-bottom: 20px;
   }
 
   .dietary-guidelines {
@@ -539,24 +755,69 @@ onMounted(() => {
   .flavor-preference {
     grid-template-columns: 1fr;
   }
+
+  .constitution-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .constitution-emoji {
+    font-size: 28px;
+  }
+
+  .card-header {
+    padding: 15px 15px 8px;
+  }
+
+  .card-content {
+    padding: 0 15px 12px;
+  }
+
+  .card-footer {
+    padding: 12px 15px;
+  }
+
+  .set-constitution-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .set-constitution-btn .btn-icon {
+    font-size: 14px;
+  }
 }
 
-/* 滚动条样式 */
-.constitution-detail::-webkit-scrollbar {
-  width: 6px;
-}
+@media (max-width: 480px) {
+  .constitution-diagnosis {
+    padding: 5px;
+  }
 
-.constitution-detail::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
+  .constitution-list-panel {
+    max-height: 250px;
+  }
 
-.constitution-detail::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
+  .panel-header {
+    padding: 15px;
+  }
 
-.constitution-detail::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  .panel-header h2 {
+    font-size: 1.1em;
+  }
+
+  .constitution-list {
+    padding: 15px;
+  }
+
+  .detail-placeholder {
+    padding: 20px;
+  }
+
+  .placeholder-icon {
+    font-size: 48px;
+  }
+
+  .placeholder-content h3 {
+    font-size: 1.1em;
+  }
 }
 </style>

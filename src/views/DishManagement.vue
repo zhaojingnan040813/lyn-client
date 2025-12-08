@@ -751,7 +751,7 @@ const saving = ref(false)
 const recipeList = ref([])
 const total = ref(0)
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 
 // 搜索相关
 const searchKeyword = ref('')

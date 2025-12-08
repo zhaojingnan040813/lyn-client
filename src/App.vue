@@ -39,13 +39,6 @@
       <el-main class="app-main">
         <router-view />
       </el-main>
-
-      <!-- 底部 -->
-      <el-footer class="app-footer">
-        <div class="footer-content">
-          <p>&copy; 2026 智膳 - 智能体质膳食推荐系统.齐齐哈尔医学院</p>
-        </div>
-      </el-footer>
     </el-container>
   </div>
 </template>
@@ -111,24 +104,6 @@ onMounted(async () => {
 .app-main {
   padding: 0;
   background-color: #f5f7fa;
-  min-height: calc(100vh - 120px);
-}
-
-.app-footer {
-  background: #2c3e50;
-  color: white;
-  padding: 20px 0;
-  text-align: center;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.footer-content p {
-  margin: 0;
-  opacity: 0.8;
+  height: calc(100vh - 60px);
 }
 </style>
