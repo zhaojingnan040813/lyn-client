@@ -1245,6 +1245,7 @@ onMounted(() => {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   padding: 15px;
+  flex: 1;
 }
 
 .ingredient-item {

@@ -1,4 +1,4 @@
-import request from './request'
+import request, { aiRequest } from './request'
 
 /**
  * 菜谱相关API
@@ -70,7 +70,7 @@ export const recipeApi = {
    * @param {string} data.foodName - 食品名称
    */
   generateRecipeByAI(data) {
-    return request.post('/recipes/generate', data)
+    return aiRequest.post('/recipes/generate', data)
   },
 
   /**
@@ -78,7 +78,7 @@ export const recipeApi = {
    * @param {Object} data - 菜谱数据
    */
   saveAIGeneratedRecipe(data) {
-    return request.post('/recipes/save-generated', data)
+    return aiRequest.post('/recipes/save-generated', data)
   },
 
   /**
@@ -90,7 +90,7 @@ export const recipeApi = {
    * @param {string} data.specialRequirements - 特殊要求
    */
   aiRecommendRecipes(data) {
-    return request.post('/recipes/ai-recommend', data)
+    return aiRequest.post('/recipes/ai-recommend', data)
   }
 }
 

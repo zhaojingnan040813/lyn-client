@@ -1,4 +1,4 @@
-import request from './request.js'
+import request, { aiRequest } from './request.js'
 
 /**
  * 发送消息到 AI
@@ -7,7 +7,7 @@ import request from './request.js'
  * @returns {Promise<{reply: string}>}
  */
 export const sendMessage = (message, history = []) => {
-  return request.post('/chat', { message, history })
+  return aiRequest.post('/chat', { message, history })
 }
 
 /**

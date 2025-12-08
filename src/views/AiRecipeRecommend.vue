@@ -49,9 +49,8 @@
           <el-input-number
             v-model="formData.count"
             :min="1"
-            :max="1"
+            :max="6"
             :step="1"
-            :disabled="true"
             controls-position="right"
             style="width: 200px"
           />
