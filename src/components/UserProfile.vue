@@ -240,17 +240,17 @@ const goToDiagnosis = () => {
   gap: 8px;
   padding: 4px 8px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .user-avatar:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 1);
 }
 
 .username {
-  color: #fff;
+  color: #333;
   font-weight: 500;
   max-width: 80px;
   overflow: hidden;
@@ -259,7 +259,7 @@ const goToDiagnosis = () => {
 }
 
 .arrow {
-  color: #fff;
+  color: #333;
   font-size: 12px;
   transition: transform 0.3s;
 }

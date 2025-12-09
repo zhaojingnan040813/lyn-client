@@ -61,14 +61,15 @@ const routes = [
       title: 'AI智能推荐 - 智能体质膳食推荐系统'
     }
   },
-  // 认证相关路由
+  // 认证相关路由 - 使用全屏布局
   {
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
     meta: {
       title: '用户登录 - 智能体质膳食推荐系统',
-      guest: true // 游客可访问
+      guest: true, // 游客可访问
+      hideNavbar: true // 隐藏导航栏
     }
   },
   {
@@ -77,7 +78,8 @@ const routes = [
     component: () => import('../views/Register.vue'),
     meta: {
       title: '用户注册 - 智能体质膳食推荐系统',
-      guest: true // 游客可访问
+      guest: true, // 游客可访问
+      hideNavbar: true // 隐藏导航栏
     }
   },
   {

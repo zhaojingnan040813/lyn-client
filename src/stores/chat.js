@@ -53,7 +53,7 @@ export const useChatStore = defineStore('chat', () => {
       addMessage('assistant', response.data.reply)
     } catch (error) {
       console.error('发送消息失败:', error)
-      addMessage('assistant', '抱歉，AI 服务暂时不可用，请稍后再试。')
+      addMessage('assistant', '抱歉，AI 服务暂时不可用，请稍后再试。111')
     } finally {
       loading.value = false
     }
@@ -83,7 +83,7 @@ export const useChatStore = defineStore('chat', () => {
         },
         onError: error => {
           console.error('流式消息错误:', error)
-          messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。'
+          messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。111'
         },
         onComplete: () => {
           currentReply.value = ''
@@ -91,7 +91,7 @@ export const useChatStore = defineStore('chat', () => {
       })
     } catch (error) {
       console.error('发送消息失败:', error)
-      messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。'
+      messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。111'
     } finally {
       loading.value = false
     }

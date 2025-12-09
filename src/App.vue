@@ -1,6 +1,12 @@
 <template>
   <div id="app">
-    <el-container class="app-container">
+    <!-- 全屏页面不显示导航栏 -->
+    <template v-if="$route.meta.hideNavbar">
+      <router-view />
+    </template>
+
+    <!-- 普通页面显示导航栏 -->
+    <el-container v-else class="app-container">
       <!-- 顶部导航栏 -->
       <el-header class="app-header">
         <div class="header-content">
@@ -76,9 +82,8 @@ import UserProfile from './components/UserProfile.vue'
   /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   padding: 0;
-  background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+  /* background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%); */
 }
-
 .header-content {
   display: flex;
   align-items: center;
