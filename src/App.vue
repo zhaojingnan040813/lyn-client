@@ -32,6 +32,11 @@
               <span>菜品管理</span>
             </el-menu-item>
           </el-menu>
+
+          <!-- 用户信息区域 -->
+          <div class="header-actions">
+            <UserProfile />
+          </div>
         </div>
       </el-header>
 
@@ -44,20 +49,8 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { Bowl, ChatDotRound, UserFilled, Operation, Star, Menu } from '@element-plus/icons-vue'
-import { useUserStore } from './stores/user'
-
-const userStore = useUserStore()
-
-// 应用启动时初始化会话
-onMounted(async () => {
-  try {
-    await userStore.initSession()
-  } catch (error) {
-    console.error('Failed to initialize session:', error)
-  }
-})
+import { ChatDotRound, UserFilled, Operation, Star, Menu } from '@element-plus/icons-vue'
+import UserProfile from './components/UserProfile.vue'
 </script>
 
 <style>
@@ -83,6 +76,7 @@ onMounted(async () => {
   /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   padding: 0;
+  background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
 }
 
 .header-content {
@@ -105,5 +99,135 @@ onMounted(async () => {
   padding: 0;
   background-color: #f5f7fa;
   height: calc(100vh - 60px);
+}
+
+/* 导航菜单样式 */
+.nav-menu {
+  background: transparent;
+  border: none;
+  flex: 1;
+}
+
+.nav-menu .el-menu-item {
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.nav-menu .el-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nav-menu .el-menu-item.is-active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+.nav-menu .el-menu-item .el-icon {
+  margin-right: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 15px;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  /* 移动端可以添加汉堡菜单 */
+  .mobile-menu-btn {
+    display: block;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Element Plus 组件样式覆盖 */
+.el-message {
+  border-radius: 8px;
+}
+
+.el-notification {
+  border-radius: 12px;
+}
+
+.el-dialog {
+  border-radius: 12px;
+}
+
+.el-card {
+  border-radius: 12px;
+}
+
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.el-input__wrapper {
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.el-form-item__label {
+  font-weight: 500;
+}
+
+/* 页面过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>

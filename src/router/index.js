@@ -60,6 +60,34 @@ const routes = [
     meta: {
       title: 'AI智能推荐 - 智能体质膳食推荐系统'
     }
+  },
+  // 认证相关路由
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/Login.vue'),
+    meta: {
+      title: '用户登录 - 智能体质膳食推荐系统',
+      guest: true // 游客可访问
+    }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
+    meta: {
+      title: '用户注册 - 智能体质膳食推荐系统',
+      guest: true // 游客可访问
+    }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('../views/Profile.vue'),
+    meta: {
+      title: '个人信息 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
+    }
   }
 ]
 
@@ -75,9 +103,33 @@ const router = createRouter({
   }
 })
 
-// 路由守卫：设置页面标题
-router.beforeEach((to, from, next) => {
+// 路由守卫：设置页面标题和权限控制
+router.beforeEach(async (to, from, next) => {
+  // 设置页面标题
   document.title = to.meta.title || '智膳 - 智能体质膳食推荐系统'
+
+  // 动态导入用户store，避免循环依赖
+  const { useUserStore } = await import('../stores/user')
+  const userStore = useUserStore()
+
+  // 检查登录状态
+  if (to.meta.requiresAuth) {
+    if (!userStore.isLoggedIn) {
+      // 需要登录但未登录，跳转到登录页
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath } // 保存重定向路径
+      })
+      return
+    }
+  }
+
+  // 如果是游客页面但用户已登录，可以重定向到首页
+  if (to.meta.guest && userStore.isLoggedIn) {
+    next('/')
+    return
+  }
+
   next()
 })
 

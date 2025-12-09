@@ -1,4 +1,10 @@
 import request from './request'
+import { authApi } from './auth'
+
+/**
+ * 认证相关API
+ */
+export { authApi }
 
 /**
  * 会话相关API
@@ -119,6 +125,7 @@ export const recipeApi = {
 }
 
 export default {
+  authApi,
   sessionApi,
   preferenceApi,
   constitutionApi,
