@@ -1,1 +1,233 @@
 @import "tailwindcss";
+
+/* 食物主题全局样式 */
+:root {
+  /* 食物主题色彩变量 */
+  --food-primary: #ff6b35;
+  --food-secondary: #4caf50;
+  --food-accent: #ffd700;
+  --food-cream: #fff8dc;
+  --food-brown: #8b4513;
+  --food-red: #dc143c;
+
+  /* 渐变背景 */
+  --food-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  --warm-gradient: linear-gradient(120deg, #fff8dc 0%, #ffe4b5 100%);
+
+  /* 阴影效果 */
+  --food-shadow: 0 4px 6px -1px rgba(255, 107, 53, 0.3), 0 2px 4px -1px rgba(255, 107, 53, 0.2);
+  --warm-shadow: 0 4px 6px -1px rgba(255, 215, 0, 0.2), 0 2px 4px -1px rgba(255, 215, 0, 0.1);
+}
+
+/* 全局字体设置 */
+body {
+  font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #fff8dc 0%, #fff5e6 50%, #ffe4b5 100%);
+  min-height: 100vh;
+}
+
+/* 食物主题滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff8dc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f7931e, #ff6b35);
+}
+
+/* Element Plus 组件食物主题覆盖 */
+.el-button--primary {
+  background: var(--food-primary);
+  border-color: var(--food-primary);
+  font-weight: 500;
+}
+
+.el-button--primary:hover {
+  background: #f7931e;
+  border-color: #f7931e;
+}
+
+.el-button--success {
+  background: var(--food-secondary);
+  border-color: var(--food-secondary);
+}
+
+.el-button--success:hover {
+  background: #45a049;
+  border-color: #45a049;
+}
+
+.el-menu--horizontal .el-menu-item.is-active {
+  background: var(--food-gradient) !important;
+  color: white !important;
+  border-bottom: none !important;
+}
+
+.el-menu--horizontal .el-menu-item:hover {
+  background: rgba(255, 107, 53, 0.1) !important;
+  color: var(--food-primary) !important;
+}
+
+.el-card {
+  border-radius: 12px;
+  box-shadow: var(--warm-shadow);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.el-card:hover {
+  box-shadow: var(--food-shadow);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.el-input__wrapper {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.el-input__wrapper:hover {
+  border-color: var(--food-primary);
+}
+
+.el-input__wrapper.is-focus {
+  border-color: var(--food-primary);
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+/* 食物装饰元素 */
+.food-decoration {
+  position: relative;
+  overflow: hidden;
+}
+
+.food-decoration::before {
+  content: "🍽️";
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-size: 80px;
+  opacity: 0.1;
+  transform: rotate(-15deg);
+  animation: float 3s ease-in-out infinite;
+}
+
+.food-decoration::after {
+  content: "🥘";
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  font-size: 60px;
+  opacity: 0.1;
+  transform: rotate(15deg);
+  animation: float 3s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-15deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-15deg);
+  }
+}
+
+/* 美食相关动画 */
+.food-card-hover {
+  transition: all 0.3s ease;
+}
+
+.food-card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--food-shadow);
+}
+
+.warm-glow {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.warm-glow:hover {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+/* 加载动画 */
+.food-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 107, 53, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--food-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  body {
+    background: linear-gradient(180deg, #fff8dc 0%, #fff5e6 50%, #ffe4b5 100%);
+  }
+
+  .food-decoration::before,
+  .food-decoration::after {
+    font-size: 40px;
+  }
+}
+
+/* 美食主题的输入框样式 */
+.food-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.food-input:focus {
+  border-color: var(--food-primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+/* 食物主题的卡片样式 */
+.food-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: var(--warm-shadow);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.food-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--food-shadow);
+}
+
+/* 页面背景装饰 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6B35' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: -1;
+}

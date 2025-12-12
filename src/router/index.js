@@ -3,14 +3,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: '/ai-diagnosis'
+    redirect: '/login' // 默认重定向到登录页面
   },
   {
     path: '/ai-diagnosis',
     name: 'AiDiagnosis',
     component: () => import('../views/AiDiagnosis.vue'),
     meta: {
-      title: 'AI问诊 - 智能体质膳食推荐系统'
+      title: 'AI问诊 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -18,7 +19,8 @@ const routes = [
     name: 'ConstitutionDiagnosis',
     component: () => import('../views/ConstitutionDiagnosis.vue'),
     meta: {
-      title: '体质诊断 - 智能体质膳食推荐系统'
+      title: '体质诊断 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -26,7 +28,8 @@ const routes = [
     name: 'TasteOptimization',
     component: () => import('../views/TasteOptimization.vue'),
     meta: {
-      title: '口味调优 - 智能体质膳食推荐系统'
+      title: '口味调优 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -34,7 +37,8 @@ const routes = [
     name: 'RecipeRecommendation',
     component: () => import('../views/RecipeRecommendation.vue'),
     meta: {
-      title: '至膳推荐 - 智能体质膳食推荐系统'
+      title: '至膳推荐 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -42,7 +46,8 @@ const routes = [
     name: 'DishManagement',
     component: () => import('../views/DishManagement.vue'),
     meta: {
-      title: '菜品管理 - 智能体质膳食推荐系统'
+      title: '菜品管理 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -50,7 +55,8 @@ const routes = [
     name: 'AiAddDish',
     component: () => import('../views/AiAddDish.vue'),
     meta: {
-      title: 'AI添加菜品 - 智能体质膳食推荐系统'
+      title: 'AI添加菜品 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   {
@@ -58,7 +64,8 @@ const routes = [
     name: 'AiRecipeRecommend',
     component: () => import('../views/AiRecipeRecommend.vue'),
     meta: {
-      title: 'AI智能推荐 - 智能体质膳食推荐系统'
+      title: 'AI智能推荐 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
     }
   },
   // 认证相关路由 - 使用全屏布局
@@ -126,9 +133,9 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // 如果是游客页面但用户已登录，可以重定向到首页
+  // 如果是游客页面但用户已登录，可以重定向到AI问诊页面
   if (to.meta.guest && userStore.isLoggedIn) {
-    next('/')
+    next('/ai-diagnosis')
     return
   }
 

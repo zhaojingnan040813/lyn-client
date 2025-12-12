@@ -1,188 +1,269 @@
 <template>
-  <div class="recipe-recommendation">
+  <div class="recipe-recommendation h-screen flex flex-col p-0">
     <!-- 页面标题 -->
-    <div class="page-header">
-      <h1 class="page-title">智能菜谱推荐</h1>
-      <p class="page-subtitle">根据您的体质特点，为您精选最适合的食养方案</p>
-    </div>
-
-    <!-- 推荐理由 -->
-    <el-alert
-      v-if="recommendationReason"
-      :title="recommendationReason"
-      type="info"
-      show-icon
-      :closable="false"
-      class="recommendation-alert"
-    />
-
-    <!-- 操作栏 -->
-    <div class="action-bar">
-      <div class="view-switch">
-        <el-radio-group v-model="viewMode" size="default">
-          <el-radio-button value="card">
-            <el-icon><Grid /></el-icon>
-            卡片视图
-          </el-radio-button>
-          <el-radio-button value="table">
-            <el-icon><List /></el-icon>
-            表格视图
-          </el-radio-button>
-        </el-radio-group>
-      </div>
-      <div class="action-buttons">
-        <el-button type="primary" @click="goToAiRecommend">
-          <el-icon><StarFilled /></el-icon>
-          AI智能推荐
-        </el-button>
-        <el-button type="success" :loading="loading" @click="loadRecommendations">
-          <el-icon v-if="!loading"><Refresh /></el-icon>
-          {{ loading ? '加载中...' : '刷新推荐' }}
-        </el-button>
+    <div
+      class="bg-white/90 backdrop-blur-md border-b border-food-cream/50 shadow-warm p-6 flex-shrink-0"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-3 mb-3">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-food-orange to-food-red rounded-full flex items-center justify-center shadow-food"
+            >
+              <span class="text-2xl">🍽️</span>
+            </div>
+            <h1 class="text-3xl font-bold text-food-brown font-title">至膳推荐</h1>
+          </div>
+          <p class="text-food-brown/70 text-lg">根据您的体质特点，为您精选最适合的食养方案</p>
+        </div>
       </div>
     </div>
 
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-container">
-      <el-icon class="loading-icon"><Loading /></el-icon>
-      <p class="loading-text">正在为您推荐合适的菜谱...</p>
-    </div>
+    <!-- 主要内容区域 -->
+    <div class="flex-1 p-6 overflow-auto">
+      <div class="max-w-7xl mx-auto">
+        <!-- 推荐理由 -->
+        <el-alert
+          v-if="recommendationReason"
+          :title="recommendationReason"
+          type="info"
+          show-icon
+          :closable="false"
+          class="recommendation-alert mb-6 food-card"
+        />
 
-    <!-- 错误状态 -->
-    <el-result v-else-if="error" icon="error" title="加载失败" :sub-title="error">
-      <template #extra>
-        <el-button type="danger" @click="loadRecommendations">重试</el-button>
-      </template>
-    </el-result>
-
-    <!-- 卡片视图 -->
-    <div v-else-if="viewMode === 'card' && recipes.length > 0" class="card-container">
-      <el-row :gutter="20">
-        <el-col :xs="24" :sm="12" :lg="8" v-for="recipe in recipes" :key="recipe.id">
-          <el-card class="recipe-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <div class="recipe-title-wrapper">
-                  <span class="recipe-emoji">{{ recipe.emoji || '🍽️' }}</span>
-                  <span class="recipe-name">{{ recipe.name }}</span>
-                </div>
-                <div class="match-score">
-                  <el-icon class="star-icon"><StarFilled /></el-icon>
-                  <span>{{ recipe.matchScore }}分</span>
-                </div>
-              </div>
-            </template>
-
-            <!-- 匹配原因 -->
-            <el-alert
-              :title="recipe.matchReason"
+        <!-- 操作栏 -->
+        <div
+          class="action-bar bg-white rounded-lg p-4 mb-6 shadow-warm flex items-center justify-between"
+        >
+          <div class="view-switch">
+            <el-radio-group v-model="viewMode" size="default" class="food-radio-group">
+              <el-radio-button value="card" class="food-radio-button">
+                <el-icon><Grid /></el-icon>
+                卡片视图
+              </el-radio-button>
+              <el-radio-button value="table" class="food-radio-button">
+                <el-icon><List /></el-icon>
+                表格视图
+              </el-radio-button>
+            </el-radio-group>
+          </div>
+          <div class="action-buttons flex gap-3">
+            <el-button
+              type="primary"
+              @click="goToAiRecommend"
+              class="shadow-food hover:shadow-food-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <el-icon><StarFilled /></el-icon>
+              AI智能推荐
+            </el-button>
+            <el-button
               type="success"
-              :closable="false"
-              class="match-reason-alert"
-            />
+              :loading="loading"
+              @click="loadRecommendations"
+              class="shadow-food hover:shadow-food-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <el-icon v-if="!loading"><Refresh /></el-icon>
+              {{ loading ? '加载中...' : '刷新推荐' }}
+            </el-button>
+          </div>
+        </div>
 
-            <!-- 菜谱描述 -->
-            <p class="recipe-description">{{ recipe.description }}</p>
+        <!-- 加载状态 -->
+        <div
+          v-if="loading"
+          class="loading-container flex flex-col items-center justify-center py-20"
+        >
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-food-orange to-food-red rounded-full flex items-center justify-center mb-4 animate-pulse-slow"
+          >
+            <span class="text-3xl">⏳</span>
+          </div>
+          <p class="loading-text text-food-brown/70 text-lg">正在为您推荐合适的菜谱...</p>
+        </div>
 
-            <!-- 标签 -->
-            <div class="tag-container">
-              <el-tag v-for="tag in recipe.tags.slice(0, 3)" :key="tag" size="small" type="primary">
-                {{ tag }}
-              </el-tag>
-            </div>
+        <!-- 错误状态 -->
+        <el-result
+          v-else-if="error"
+          icon="error"
+          title="加载失败"
+          :sub-title="error"
+          class="food-card"
+        >
+          <template #extra>
+            <el-button type="danger" @click="loadRecommendations" class="shadow-food">
+              重试
+            </el-button>
+          </template>
+        </el-result>
 
-            <!-- 基本信息 -->
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">时长</span>
-                <span class="info-value">{{ recipe.cookingTime }}分钟</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">难度</span>
-                <span class="info-value">{{ recipe.difficulty }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">性质</span>
-                <span class="info-value">{{ recipe.nature }}</span>
-              </div>
-            </div>
+        <!-- 卡片视图 -->
+        <div v-else-if="viewMode === 'card' && recipes.length > 0" class="card-container">
+          <el-row :gutter="20">
+            <el-col :xs="24" :sm="12" :lg="8" v-for="recipe in recipes" :key="recipe.id">
+              <el-card class="recipe-card food-card food-card-hover" shadow="hover">
+                <template #header>
+                  <div class="card-header">
+                    <div class="recipe-title-wrapper">
+                      <span class="recipe-emoji text-2xl">{{ recipe.emoji || '🍽️' }}</span>
+                      <span class="recipe-name">{{ recipe.name }}</span>
+                    </div>
+                    <div class="match-score">
+                      <el-icon class="star-icon text-food-orange"><StarFilled /></el-icon>
+                      <span class="text-food-brown font-semibold">{{ recipe.matchScore }}分</span>
+                    </div>
+                  </div>
+                </template>
 
-            <!-- 查看详情按钮 -->
-            <div class="card-footer">
-              <el-button type="primary" @click="viewRecipeDetail(recipe)" style="width: 100%">
-                查看详情
-              </el-button>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+                <!-- 匹配原因 -->
+                <el-alert
+                  :title="recipe.matchReason"
+                  type="success"
+                  :closable="false"
+                  class="match-reason-alert mb-3"
+                />
+
+                <!-- 菜谱描述 -->
+                <p class="recipe-description text-food-brown/80 mb-4">{{ recipe.description }}</p>
+
+                <!-- 标签 -->
+                <div class="tag-container mb-4">
+                  <el-tag
+                    v-for="tag in recipe.tags.slice(0, 3)"
+                    :key="tag"
+                    size="small"
+                    type="primary"
+                    class="mr-2"
+                  >
+                    {{ tag }}
+                  </el-tag>
+                </div>
+
+                <!-- 基本信息 -->
+                <div class="info-grid mb-4">
+                  <div class="info-item">
+                    <span class="info-label text-food-brown/60">⏱️ 时长</span>
+                    <span class="info-value text-food-brown font-medium">
+                      {{ recipe.cookingTime }}分钟
+                    </span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label text-food-brown/60">📊 难度</span>
+                    <span class="info-value text-food-brown font-medium">
+                      {{ recipe.difficulty }}
+                    </span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label text-food-brown/60">🌡️ 性质</span>
+                    <span class="info-value text-food-brown font-medium">{{ recipe.nature }}</span>
+                  </div>
+                </div>
+
+                <!-- 查看详情按钮 -->
+                <div class="card-footer">
+                  <el-button
+                    type="primary"
+                    @click="viewRecipeDetail(recipe)"
+                    class="w-full shadow-food hover:shadow-food-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    查看详情
+                  </el-button>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 表格视图 -->
+        <div
+          v-else-if="viewMode === 'table' && recipes.length > 0"
+          class="table-container food-card"
+        >
+          <el-table :data="recipes" stripe class="w-full">
+            <el-table-column label="菜谱名称" min-width="200">
+              <template #default="{ row }">
+                <div class="table-recipe-name">
+                  <span class="recipe-emoji text-xl">{{ row.emoji || '🍽️' }}</span>
+                  <div class="recipe-info">
+                    <div class="recipe-name font-medium text-food-brown">{{ row.name }}</div>
+                    <div class="recipe-desc-short text-food-brown/70 text-sm">
+                      {{ row.description }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="匹配度" width="160">
+              <template #default="{ row }">
+                <div class="match-info">
+                  <div class="match-score-table">
+                    <el-icon class="star-icon text-food-orange"><StarFilled /></el-icon>
+                    <span class="text-food-brown font-medium">{{ row.matchScore }}分</span>
+                  </div>
+                  <div class="match-reason-text text-food-brown/70 text-sm">
+                    {{ row.matchReason }}
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="cookingTime" label="烹饪时间" width="100">
+              <template #default="{ row }">{{ row.cookingTime }}分钟</template>
+            </el-table-column>
+            <el-table-column label="难度" width="80">
+              <template #default="{ row }">
+                <el-tag :type="getDifficultyType(row.difficulty)" size="small">
+                  {{ row.difficulty }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="性质" width="80">
+              <template #default="{ row }">
+                <el-tag :type="getNatureType(row.nature)" size="small">
+                  {{ row.nature }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="标签" min-width="150">
+              <template #default="{ row }">
+                <div class="tag-container-table">
+                  <el-tag
+                    v-for="tag in row.tags.slice(0, 2)"
+                    :key="tag"
+                    size="small"
+                    type="primary"
+                    class="mr-1"
+                  >
+                    {{ tag }}
+                  </el-tag>
+                  <span v-if="row.tags.length > 2" class="more-tags text-food-brown/60">
+                    +{{ row.tags.length - 2 }}
+                  </span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" fixed="right">
+              <template #default="{ row }">
+                <el-button
+                  type="primary"
+                  link
+                  @click="viewRecipeDetail(row)"
+                  class="text-food-orange hover:text-food-red"
+                >
+                  查看详情
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
+        <!-- 空状态 -->
+        <el-empty
+          v-else-if="!loading && !error && recipes.length === 0"
+          description="暂无推荐菜谱，请稍后再试或完善您的体质信息"
+          class="food-card"
+        />
+      </div>
     </div>
-
-    <!-- 表格视图 -->
-    <div v-else-if="viewMode === 'table' && recipes.length > 0" class="table-container">
-      <el-table :data="recipes" stripe style="width: 100%">
-        <el-table-column label="菜谱名称" min-width="200">
-          <template #default="{ row }">
-            <div class="table-recipe-name">
-              <span class="recipe-emoji">{{ row.emoji || '🍽️' }}</span>
-              <div class="recipe-info">
-                <div class="recipe-name">{{ row.name }}</div>
-                <div class="recipe-desc-short">{{ row.description }}</div>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="匹配度" width="160">
-          <template #default="{ row }">
-            <div class="match-info">
-              <div class="match-score-table">
-                <el-icon class="star-icon"><StarFilled /></el-icon>
-                <span>{{ row.matchScore }}分</span>
-              </div>
-              <div class="match-reason-text">{{ row.matchReason }}</div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="cookingTime" label="烹饪时间" width="100">
-          <template #default="{ row }">{{ row.cookingTime }}分钟</template>
-        </el-table-column>
-        <el-table-column label="难度" width="80">
-          <template #default="{ row }">
-            <el-tag :type="getDifficultyType(row.difficulty)" size="small">
-              {{ row.difficulty }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="性质" width="80">
-          <template #default="{ row }">
-            <el-tag :type="getNatureType(row.nature)" size="small">
-              {{ row.nature }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="标签" min-width="150">
-          <template #default="{ row }">
-            <div class="tag-container-table">
-              <el-tag v-for="tag in row.tags.slice(0, 2)" :key="tag" size="small" type="primary">
-                {{ tag }}
-              </el-tag>
-              <span v-if="row.tags.length > 2" class="more-tags">+{{ row.tags.length - 2 }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="100" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="viewRecipeDetail(row)">查看详情</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-
-    <!-- 空状态 -->
-    <el-empty
-      v-else-if="!loading && !error && recipes.length === 0"
-      description="暂无推荐菜谱，请稍后再试或完善您的体质信息"
-    />
 
     <!-- 菜谱详情对话框 -->
     <el-dialog
@@ -410,4 +491,220 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 食物主题样式覆盖 */
+:deep(.el-alert) {
+  border-radius: 12px;
+}
+
+:deep(.el-alert__title) {
+  font-weight: 600;
+}
+
+:deep(.el-radio-group) {
+  background: transparent;
+}
+
+:deep(.el-radio-button__inner) {
+  background: white;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  color: var(--food-brown);
+  font-weight: 500;
+}
+
+:deep(.el-radio-button__original:hover .el-radio-button__inner) {
+  border-color: var(--food-primary);
+  background: rgba(255, 107, 53, 0.1);
+}
+
+:deep(.el-radio-button.is-active .el-radio-button__inner) {
+  background: var(--food-gradient);
+  border-color: var(--food-primary);
+  color: white;
+}
+
+:deep(.el-result) {
+  background: white;
+  border-radius: 16px;
+}
+
+:deep(.el-empty) {
+  background: white;
+  border-radius: 16px;
+}
+
+:deep(.el-table) {
+  background: white;
+  border-radius: 12px;
+}
+
+:deep(.el-table th) {
+  background: linear-gradient(135deg, rgba(255, 249, 196, 0.3), rgba(255, 236, 179, 0.2));
+  color: var(--food-brown);
+  font-weight: 600;
+}
+
+:deep(.el-table tr:hover > td) {
+  background: rgba(255, 107, 53, 0.05);
+}
+
+/* 卡片布局样式 */
+.card-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.table-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .recipe-recommendation {
+    padding: 0;
+  }
+
+  .action-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .action-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+}
+
+/* 卡片内容样式 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipe-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipe-emoji {
+  font-size: 1.5rem;
+}
+
+.recipe-name {
+  font-weight: 600;
+  color: var(--food-brown);
+}
+
+.match-score {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-icon {
+  color: var(--food-orange);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 249, 196, 0.5);
+}
+
+.info-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  font-weight: 600;
+  color: var(--food-brown);
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.table-recipe-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recipe-info {
+  flex: 1;
+}
+
+.match-info {
+  text-align: center;
+}
+
+.match-score-table {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.match-reason-text {
+  font-size: 0.875rem;
+  color: var(--food-brown);
+  opacity: 0.8;
+}
+
+.tag-container-table {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.more-tags {
+  font-size: 0.875rem;
+  color: var(--food-brown);
+  opacity: 0.6;
+}
+
+/* 滚动条美化 */
+.overflow-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: rgba(255, 249, 196, 0.2);
+  border-radius: 4px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--food-orange), var(--food-red));
+  border-radius: 4px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--food-red), var(--food-orange));
+}
+</style>
