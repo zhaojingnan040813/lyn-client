@@ -73,14 +73,4 @@ const handleSave = () => {
 }
 </script>
 
-<style scoped>
-.column-settings {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.column-settings .el-checkbox {
-  margin-bottom: 10px;
-  width: 100%;
-}
-</style>
+<style scoped></style>

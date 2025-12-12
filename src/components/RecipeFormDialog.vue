@@ -271,29 +271,4 @@ const handleSave = async () => {
 }
 </script>
 
-<style scoped>
-.ingredients-section,
-.steps-section {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  padding: 15px;
-}
-
-.ingredient-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.step-item {
-  margin-bottom: 15px;
-}
-
-.step-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-</style>
+<style scoped></style>
