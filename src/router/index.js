@@ -104,6 +104,15 @@ const routes = [
     }
   },
   {
+    path: '/preference-settings',
+    name: 'PreferenceSettings',
+    component: () => import('../views/PreferenceSettings.vue'),
+    meta: {
+      title: '偏好设置 - 智能体质膳食推荐系统',
+      requiresAuth: true // 需要登录
+    }
+  },
+  {
     path: '/test-chat',
     name: 'TestChat',
     component: () => import('../views/TestChat.vue'),

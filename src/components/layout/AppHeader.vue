@@ -36,12 +36,8 @@
             </button>
           </template>
           <template v-else>
-            <router-link to="/login" class="btn btn-ghost btn-sm">
-              登录
-            </router-link>
-            <router-link to="/register" class="btn btn-primary btn-sm">
-              注册
-            </router-link>
+            <router-link to="/login" class="btn btn-ghost btn-sm">登录</router-link>
+            <router-link to="/register" class="btn btn-primary btn-sm">注册</router-link>
           </template>
 
           <!-- 移动端菜单按钮 -->
@@ -88,13 +84,13 @@ const showMobileMenu = ref(false)
 
 const menuItems = computed(() => {
   if (!userStore.isLoggedIn && !userStore.sessionId) return []
-  
+
   const items = [
     { path: '/ai-diagnosis', label: 'AI 问诊' },
     { path: '/constitution-diagnosis', label: '体质测评' },
     { path: '/recipe-recommendation', label: '菜谱浏览' },
     { path: '/ai-recipe-recommend', label: '智能推荐' },
-    { path: '/taste-optimization', label: '偏好设置' }
+    { path: '/preference-settings', label: '偏好设置' }
   ]
 
   // 管理员才能看到菜品管理
