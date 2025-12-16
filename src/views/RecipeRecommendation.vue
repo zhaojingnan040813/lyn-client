@@ -3,28 +3,21 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">
-          <span class="title-icon">🍽️</span>
-          至膳推荐
-        </h1>
-        <p class="page-description">基于您的体质和偏好，为您推荐最适合的健康菜谱</p>
-      </div>
+        <!-- 快捷操作 -->
+        <div class="header-actions">
+          <button class="btn btn-secondary toggle-filters-btn" @click="toggleFilters">
+            <span class="btn-icon">🎯</span>
+            <span>筛选</span>
+          </button>
+        </div>
 
-      <!-- 快捷操作 -->
-      <div class="header-actions">
-        <button
-          v-if="userStore.isLoggedIn"
-          class="btn btn-accent ai-recommend-btn"
-          @click="handleAiRecommend"
-          :disabled="aiRecommendLoading"
-        >
-          <span class="btn-icon">{{ aiRecommendLoading ? '⏳' : '🤖' }}</span>
-          <span>AI智能推荐</span>
-        </button>
-        <button class="btn btn-secondary toggle-filters-btn" @click="toggleFilters">
-          <span class="btn-icon">🎯</span>
-          <span>筛选</span>
-        </button>
+        <div class="title-section">
+          <!-- <h1 class="page-title">
+            <span class="title-icon">🍽️</span>
+            至膳推荐
+          </h1> -->
+          <p class="page-description">基于您的体质和偏好，为您推荐最适合的健康菜谱</p>
+        </div>
       </div>
     </div>
 
@@ -92,7 +85,6 @@ const showFilters = ref(true)
 const showDetailModal = ref(false)
 const selectedRecipe = ref(null)
 const detailLoading = ref(false)
-const aiRecommendLoading = ref(false)
 const loadingRecipeIds = ref(new Set())
 
 // 搜索参数
@@ -129,11 +121,6 @@ onMounted(async () => {
 const loadInitialData = async () => {
   // 获取推荐菜谱
   await loadRecipes()
-
-  // 如果用户已登录，加载个性化推荐
-  if (userStore.isLoggedIn) {
-    await loadPersonalizedRecommendations()
-  }
 }
 
 // 加载菜谱列表
@@ -143,19 +130,6 @@ const loadRecipes = async () => {
   } catch (error) {
     console.error('加载菜谱失败:', error)
     toast.error('加载菜谱失败，请稍后重试')
-  }
-}
-
-// 加载个性化推荐
-const loadPersonalizedRecommendations = async () => {
-  try {
-    aiRecommendLoading.value = true
-    await recipeStore.fetchPersonalizedRecommendations()
-  } catch (error) {
-    console.error('加载个性化推荐失败:', error)
-    toast.warning('个性化推荐加载失败，显示通用推荐')
-  } finally {
-    aiRecommendLoading.value = false
   }
 }
 
@@ -281,36 +255,6 @@ const retryLoadDetail = async () => {
   }
 }
 
-// AI智能推荐
-const handleAiRecommend = async () => {
-  if (!userStore.isLoggedIn) {
-    toast.warning('请先登录后再使用AI推荐功能')
-    router.push('/login')
-    return
-  }
-
-  try {
-    aiRecommendLoading.value = true
-    const result = await recipeStore.fetchAiRecommendations({
-      mealType: 'dinner',
-      count: 6,
-      specialRequirements: '希望菜品健康营养，适合日常食用'
-    })
-
-    if (result && result.length) {
-      toast.success('AI推荐完成，已为您生成专属菜谱')
-      // 切换到AI推荐分类
-      searchParams.category = 'recommended'
-      await loadRecipes()
-    }
-  } catch (error) {
-    console.error('AI推荐失败:', error)
-    toast.error('AI推荐失败，请稍后重试')
-  } finally {
-    aiRecommendLoading.value = false
-  }
-}
-
 // 监听滚动事件，实现无限滚动
 const handleScroll = async () => {
   if (recipeStore.loading || recipeStore.hasMore === false) return
@@ -368,9 +312,24 @@ onUnmounted(() => {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
+}
+
+/* 快捷操作区域 - 居左 */
+.header-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  order: -1; /* 确保在标题前面 */
+}
+
+/* 标题区域 */
+.title-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .page-title {
@@ -391,34 +350,11 @@ onUnmounted(() => {
 .page-description {
   font-size: var(--text-base);
   color: var(--color-text-secondary);
-  margin: 0;
+  margin: var(--spacing-xs) 0 0 0;
   line-height: var(--leading-relaxed);
 }
 
-.header-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-.ai-recommend-btn {
-  background: var(--gradient-accent);
-  border: none;
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-recommend-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.ai-recommend-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
+/* 按钮样式 */
 .toggle-filters-btn {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-medium);
@@ -479,11 +415,18 @@ onUnmounted(() => {
     gap: var(--spacing-md);
   }
 
-  .page-title {
-    font-size: var(--text-2xl);
+  .header-actions {
+    order: 1; /* 在小屏幕上移到标题下面 */
+    justify-content: center;
   }
 
-  .header-actions {
+  .title-section {
+    order: 0; /* 标题在前面 */
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: var(--text-2xl);
     justify-content: center;
   }
 }
@@ -594,29 +537,6 @@ onUnmounted(() => {
     var(--color-border-light) 80%,
     transparent 100%
   );
-}
-
-/* AI推荐按钮动画 */
-.ai-recommend-btn:not(:disabled) {
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-recommend-btn:not(:disabled)::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  transition: all 0.6s ease;
-  transform: translate(-50%, -50%);
-}
-
-.ai-recommend-btn:not(:disabled):hover::before {
-  width: 300px;
-  height: 300px;
 }
 
 /* 页面切换动画 */
