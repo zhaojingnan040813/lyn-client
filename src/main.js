@@ -13,16 +13,6 @@ app.use(pinia)
 // 使用路由
 app.use(router)
 
-// 初始化用户会话
-import { useUserStore } from './stores/user'
-const userStore = useUserStore()
-
-// 在应用挂载前初始化会话
-userStore.initSession().then(() => {
-  // 挂载应用
-  app.mount('#app')
-}).catch(err => {
-  console.error('Failed to initialize session:', err)
-  // 即使初始化失败也挂载应用
-  app.mount('#app')
-})
+// 直接挂载应用，不在启动时初始化会话
+// 会话将在用户登录/注册/游客登录时创建，或在访问需要认证的页面时尝试恢复
+app.mount('#app')

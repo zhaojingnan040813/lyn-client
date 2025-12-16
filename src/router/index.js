@@ -143,6 +143,11 @@ router.beforeEach(async (to, from, next) => {
   const { useUserStore } = await import('../stores/user')
   const userStore = useUserStore()
 
+  // 如果localStorage中有sessionId但userInfo为空，尝试恢复会话（仅在需要时）
+  if (to.meta.requiresAuth && !userStore.isLoggedIn && localStorage.getItem('sessionId')) {
+    await userStore.initSession()
+  }
+
   // 检查登录状态
   if (to.meta.requiresAuth) {
     if (!userStore.isLoggedIn) {

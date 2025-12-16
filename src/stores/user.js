@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', () => {
   const hasConstitution = computed(() => !!constitution.value?.type)
   const username = computed(() => userInfo.value?.username || '游客')
 
-  // 初始化会话
+  // 初始化会话（仅恢复已有会话，不创建新会话）
   const initSession = async () => {
     try {
       // 如果已有sessionId，尝试获取会话信息
@@ -33,15 +33,15 @@ export const useUserStore = defineStore('user', () => {
             if (constitution.value?.type) {
               await fetchConstitutionInfo(constitution.value.type)
             }
-            return
+            return true
           }
         } catch (err) {
-          console.warn('Session not found, creating new one')
+          console.warn('Session not found or expired, clearing local storage')
+          // 会话无效，清除本地存储
+          clearSession()
         }
       }
-
-      // 创建新会话
-      await createSession()
+      return false
     } finally {
       loading.value = false
     }
@@ -68,7 +68,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 用户注册
-  const register = async (data) => {
+  const register = async data => {
     try {
       loading.value = true
       error.value = null
@@ -93,7 +93,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 用户登录
-  const login = async (data) => {
+  const login = async data => {
     try {
       loading.value = true
       error.value = null
