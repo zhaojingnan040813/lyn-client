@@ -23,3 +23,9 @@ export { default as RecipeFilters } from './recipe/RecipeFilters.vue'
 export { default as RecipeGrid } from './recipe/RecipeGrid.vue'
 export { default as RecipeDetailModal } from './recipe/RecipeDetailModal.vue'
 export { default as EmptyState } from './recipe/EmptyState.vue'
+
+// AI推荐相关组件
+export { default as AiRecommendPanel } from './recipe/AiRecommendPanel.vue'
+export { default as AiAnalysisCard } from './recipe/AiAnalysisCard.vue'
+export { default as RecipeSaveModal } from './recipe/RecipeSaveModal.vue'
+export { default as MatchScoreIndicator } from './recipe/MatchScoreIndicator.vue'
