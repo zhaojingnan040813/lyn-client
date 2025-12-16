@@ -3,7 +3,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: '/login' // 默认重定向到登录页面
+    name: 'Home',
+    component: () => import('../views/Home.vue'),
+    meta: {
+      title: '首页 - 智膳 - 智能体质膳食推荐系统'
+    }
   },
   {
     path: '/ai-diagnosis',
