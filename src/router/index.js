@@ -80,7 +80,6 @@ const routes = [
     component: () => import('../views/Login.vue'),
     meta: {
       title: '用户登录 - 智能体质膳食推荐系统',
-      guest: true, // 游客可访问
       hideNavbar: true // 隐藏导航栏
     }
   },
@@ -90,7 +89,6 @@ const routes = [
     component: () => import('../views/Register.vue'),
     meta: {
       title: '用户注册 - 智能体质膳食推荐系统',
-      guest: true, // 游客可访问
       hideNavbar: true // 隐藏导航栏
     }
   },
@@ -168,12 +166,6 @@ router.beforeEach(async (to, from, next) => {
       })
       return
     }
-  }
-
-  // 如果是游客页面但用户已登录，可以重定向到AI问诊页面
-  if (to.meta.guest && userStore.isLoggedIn) {
-    next('/ai-diagnosis')
-    return
   }
 
   next()

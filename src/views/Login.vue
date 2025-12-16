@@ -35,27 +35,10 @@
           </button>
         </form>
 
-        <div class="divider-container">
-          <div class="divider">
-            <span class="divider-text">或</span>
-          </div>
-        </div>
-
-        <button 
-          type="button" 
-          class="btn btn-ghost btn-lg" 
-          @click="handleGuestLogin"
-          :disabled="loading"
-        >
-          游客登录
-        </button>
-
         <div class="auth-footer">
           <p class="text-secondary">
             还没有账号？
-            <router-link to="/register" class="text-primary font-medium">
-              立即注册
-            </router-link>
+            <router-link to="/register" class="text-primary font-medium">立即注册</router-link>
           </p>
         </div>
       </div>
@@ -87,19 +70,6 @@ const handleLogin = async () => {
     router.push('/ai-diagnosis')
   } catch (error) {
     toast.error(error.message || '登录失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleGuestLogin = async () => {
-  loading.value = true
-  try {
-    await userStore.guestLogin()
-    toast.success('以游客身份进入')
-    router.push('/ai-diagnosis')
-  } catch (error) {
-    toast.error(error.message || '游客登录失败')
   } finally {
     loading.value = false
   }
@@ -163,34 +133,6 @@ const handleGuestLogin = async () => {
 .auth-form .btn {
   width: 100%;
   margin-top: var(--spacing-md);
-}
-
-.divider-container {
-  margin: var(--spacing-lg) 0;
-}
-
-.divider {
-  position: relative;
-  text-align: center;
-}
-
-.divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--color-border-light);
-}
-
-.divider-text {
-  position: relative;
-  display: inline-block;
-  padding: 0 var(--spacing-md);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-tertiary);
-  font-size: var(--text-sm);
 }
 
 .auth-footer {

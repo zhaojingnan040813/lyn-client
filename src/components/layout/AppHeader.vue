@@ -26,14 +26,11 @@
           <template v-if="userStore.sessionId">
             <div class="user-info">
               <span class="user-badge" v-if="userStore.isAdmin">管理员</span>
-              <span class="user-badge guest" v-else-if="!userStore.isLoggedIn">游客</span>
               <button class="btn btn-ghost btn-sm" @click="handleProfile">
                 {{ userStore.username }}
               </button>
             </div>
-            <button class="btn btn-secondary btn-sm" @click="handleLogout">
-              {{ userStore.isLoggedIn ? '退出' : '登录' }}
-            </button>
+            <button class="btn btn-secondary btn-sm" @click="handleLogout">退出</button>
           </template>
           <template v-else>
             <router-link to="/login" class="btn btn-ghost btn-sm">登录</router-link>
@@ -122,13 +119,8 @@ const handleProfile = () => {
 }
 
 const handleLogout = async () => {
-  if (userStore.isLoggedIn) {
-    await userStore.logout()
-    router.push('/login')
-  } else {
-    // 游客点击登录按钮
-    router.push('/login')
-  }
+  await userStore.logout()
+  router.push('/login')
 }
 
 onMounted(() => {
@@ -261,10 +253,6 @@ onUnmounted(() => {
   background: var(--color-primary);
   color: var(--color-text-inverse);
   border-radius: var(--radius-full);
-}
-
-.user-badge.guest {
-  background: var(--color-text-tertiary);
 }
 
 /* 移动端菜单按钮 */

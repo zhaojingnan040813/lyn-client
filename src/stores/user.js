@@ -12,11 +12,11 @@ export const useUserStore = defineStore('user', () => {
   const error = ref(null)
 
   // 计算属性
-  const isLoggedIn = computed(() => !!sessionId.value && userInfo.value?.userType !== 'anonymous')
+  const isLoggedIn = computed(() => !!sessionId.value)
   const isRegisteredUser = computed(() => userInfo.value?.userType === 'registered')
   const isAdmin = computed(() => userInfo.value?.role === 'admin')
   const hasConstitution = computed(() => !!constitution.value?.type)
-  const username = computed(() => userInfo.value?.username || '游客')
+  const username = computed(() => userInfo.value?.username || '用户')
 
   // 初始化会话（仅恢复已有会话，不创建新会话）
   const initSession = async () => {
@@ -110,22 +110,6 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       error.value = err.message || err.response?.data?.message || '登录失败'
       console.error('Failed to login:', err)
-      throw new Error(error.value)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // 游客登录（创建匿名会话）
-  const guestLogin = async () => {
-    try {
-      loading.value = true
-      error.value = null
-      await createSession()
-      return userInfo.value
-    } catch (err) {
-      error.value = err.message || '游客登录失败'
-      console.error('Failed to guest login:', err)
       throw new Error(error.value)
     } finally {
       loading.value = false
@@ -285,7 +269,6 @@ export const useUserStore = defineStore('user', () => {
     createSession,
     register,
     login,
-    guestLogin,
     logout,
     fetchUserInfo,
     changePassword,

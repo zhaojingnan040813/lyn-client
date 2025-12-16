@@ -8,9 +8,7 @@
             {{ userStore.username.charAt(0) }}
           </div>
           <h3 class="user-name">{{ userStore.username }}</h3>
-          <span class="user-type-badge" :class="userStore.isLoggedIn ? 'registered' : 'guest'">
-            {{ userStore.isLoggedIn ? '注册用户' : '游客' }}
-          </span>
+          <span class="user-type-badge registered" v-if="userStore.isLoggedIn">注册用户</span>
 
           <div class="divider"></div>
 
@@ -338,10 +336,6 @@ onMounted(() => {
 .user-type-badge.registered {
   background: var(--color-primary-alpha);
   color: var(--color-primary-dark);
-}
-
-.user-type-badge.guest {
-  background: var(--color-bg-tertiary);
 }
 
 .constitution-info {
