@@ -157,7 +157,7 @@
                         <div v-for="(step, index) in recipe.steps" :key="index" class="step-item">
                           <div class="step-number">{{ index + 1 }}</div>
                           <div class="step-content">
-                            <p class="step-description">{{ step.description || step }}</p>
+                            <p class="step-description">{{ step.content || step }}</p>
                             <div v-if="step.time" class="step-time">
                               <span class="time-icon">⏱️</span>
                               {{ step.time }}
