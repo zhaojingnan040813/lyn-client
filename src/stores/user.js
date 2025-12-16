@@ -3,11 +3,42 @@ import { ref, computed } from 'vue'
 import { sessionApi, constitutionApi, authApi } from '../api'
 
 export const useUserStore = defineStore('user', () => {
+  // 从localStorage恢复状态
+  const getStoredUserInfo = () => {
+    try {
+      const stored = localStorage.getItem('userInfo')
+      return stored ? JSON.parse(stored) : null
+    } catch (error) {
+      console.warn('Failed to parse userInfo from localStorage:', error)
+      return null
+    }
+  }
+
+  const getStoredConstitution = () => {
+    try {
+      const stored = localStorage.getItem('constitution')
+      return stored ? JSON.parse(stored) : null
+    } catch (error) {
+      console.warn('Failed to parse constitution from localStorage:', error)
+      return null
+    }
+  }
+
+  const getStoredConstitutionInfo = () => {
+    try {
+      const stored = localStorage.getItem('constitutionInfo')
+      return stored ? JSON.parse(stored) : null
+    } catch (error) {
+      console.warn('Failed to parse constitutionInfo from localStorage:', error)
+      return null
+    }
+  }
+
   // 状态
   const sessionId = ref(localStorage.getItem('sessionId') || null)
-  const userInfo = ref(null)
-  const constitution = ref(null)
-  const constitutionInfo = ref(null)
+  const userInfo = ref(getStoredUserInfo())
+  const constitution = ref(getStoredConstitution())
+  const constitutionInfo = ref(getStoredConstitutionInfo())
   const loading = ref(false)
   const error = ref(null)
 
@@ -25,10 +56,20 @@ export const useUserStore = defineStore('user', () => {
       if (sessionId.value) {
         try {
           loading.value = true
-          const response = await sessionApi.getSession(sessionId.value)
+          const response = await authApi.getCurrentUser()
           if (response.code === 0) {
+            console.log('Session restored using /api/auth/me:', response.data)
             userInfo.value = response.data.user
             constitution.value = response.data.user.constitution
+
+            // 保存到localStorage
+            if (userInfo.value) {
+              localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+            }
+            if (constitution.value) {
+              localStorage.setItem('constitution', JSON.stringify(constitution.value))
+            }
+
             // 如果有体质，获取体质详情
             if (constitution.value?.type) {
               await fetchConstitutionInfo(constitution.value.type)
@@ -53,11 +94,20 @@ export const useUserStore = defineStore('user', () => {
       loading.value = true
       error.value = null
       const response = await sessionApi.createSession()
+      console.log('Create session response:', response.code, response.data)
       if (response.code === 0) {
         sessionId.value = response.data.sessionId
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
+
+        // 保存到localStorage
         localStorage.setItem('sessionId', sessionId.value)
+        if (userInfo.value) {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+        }
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
       }
     } catch (err) {
       error.value = err.message
@@ -78,7 +128,16 @@ export const useUserStore = defineStore('user', () => {
         sessionId.value = response.data.sessionId
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
+
+        // 保存到localStorage
         localStorage.setItem('sessionId', sessionId.value)
+        if (userInfo.value) {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+        }
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+
         return response.data
       } else {
         throw new Error(response.message || '注册失败')
@@ -102,7 +161,16 @@ export const useUserStore = defineStore('user', () => {
         sessionId.value = response.data.sessionId
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
+
+        // 保存到localStorage
         localStorage.setItem('sessionId', sessionId.value)
+        if (userInfo.value) {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+        }
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+
         return response.data
       } else {
         throw new Error(response.message || '登录失败')
@@ -139,6 +207,15 @@ export const useUserStore = defineStore('user', () => {
       if (response.code === 0) {
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
+
+        // 保存到localStorage
+        if (userInfo.value) {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+        }
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+
         return response.data.user
       }
     } catch (err) {
@@ -189,6 +266,15 @@ export const useUserStore = defineStore('user', () => {
       if (response.code === 0) {
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
+
+        // 保存到localStorage
+        if (userInfo.value) {
+          localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+        }
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+
         return response.data.authenticated
       }
       return false
@@ -216,6 +302,15 @@ export const useUserStore = defineStore('user', () => {
       if (response.code === 0) {
         constitution.value = response.data.constitution
         constitutionInfo.value = response.data.constitutionInfo
+
+        // 保存到localStorage
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+        if (constitutionInfo.value) {
+          localStorage.setItem('constitutionInfo', JSON.stringify(constitutionInfo.value))
+        }
+
         return true
       }
       return false
@@ -234,6 +329,11 @@ export const useUserStore = defineStore('user', () => {
       const response = await constitutionApi.getConstitutionByType(type)
       if (response.code === 0) {
         constitutionInfo.value = response.data
+
+        // 保存到localStorage
+        if (constitutionInfo.value) {
+          localStorage.setItem('constitutionInfo', JSON.stringify(constitutionInfo.value))
+        }
       }
     } catch (err) {
       console.error('Failed to fetch constitution info:', err)
@@ -246,7 +346,12 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = null
     constitution.value = null
     constitutionInfo.value = null
+
+    // 清除所有相关的localStorage数据
     localStorage.removeItem('sessionId')
+    localStorage.removeItem('userInfo')
+    localStorage.removeItem('constitution')
+    localStorage.removeItem('constitutionInfo')
   }
 
   return {
