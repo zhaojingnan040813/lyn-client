@@ -62,7 +62,13 @@
         <div class="result-container" v-if="showResult && !loading">
           <div class="result-header">
             <h2 class="result-title">您的体质测评结果</h2>
-            <p class="result-subtitle">基于您的回答，我们为您生成了个性化的体质分析</p>
+            <p class="result-subtitle">
+              {{
+                userStore.hasConstitution && !hasStarted
+                  ? '您已保存的体质信息'
+                  : '基于您的回答，我们为您生成了个性化的体质分析'
+              }}
+            </p>
           </div>
 
           <div class="result-content">
@@ -90,7 +96,7 @@
             </div>
 
             <!-- 雷达图 -->
-            <div class="chart-container">
+            <div class="chart-container" v-if="constitutionScores.length > 0">
               <h3>体质倾向分析</h3>
               <RadarChart :constitution-scores="constitutionScores" />
             </div>
@@ -128,7 +134,13 @@
 
             <!-- 操作按钮 -->
             <div class="result-actions">
-              <button class="btn btn-primary" @click="saveResult">保存结果</button>
+              <button
+                v-if="!userStore.hasConstitution || hasStarted"
+                class="btn btn-primary"
+                @click="saveResult"
+              >
+                保存结果
+              </button>
               <button class="btn btn-secondary" @click="restartTest">重新测评</button>
               <button class="btn btn-outline" @click="goToRecommendation">查看膳食推荐</button>
             </div>
@@ -136,7 +148,7 @@
         </div>
 
         <!-- 开始测评区域 -->
-        <div class="start-container" v-if="!hasStarted && !loading">
+        <div class="start-container" v-if="!hasStarted && !loading && !userStore.hasConstitution">
           <div class="start-card">
             <div class="start-icon">🔮</div>
             <h2>开始您的体质测评之旅</h2>
@@ -536,6 +548,17 @@ const currentQuestion = computed(() => {
 })
 
 const primaryConstitution = computed(() => {
+  // 如果用户已有保存的体质信息，直接显示
+  if (userStore.constitution?.type && !hasStarted.value) {
+    return {
+      type: userStore.constitution.type,
+      name: getConstitutionName(userStore.constitution.type),
+      description: getConstitutionDescription(userStore.constitution.type),
+      characteristics: getConstitutionCharacteristics(userStore.constitution.type)
+    }
+  }
+
+  // 如果是基于问卷计算的结果
   if (!constitutionScores.value.length) return null
 
   const maxScore = Math.max(...constitutionScores.value.map(s => s.score))
@@ -552,6 +575,11 @@ const primaryConstitution = computed(() => {
 const constitutionScores = ref([])
 
 // 方法
+const getConstitutionName = type => {
+  const constitution = constitutionTypes.value.find(c => c.type === type)
+  return constitution ? constitution.name : ''
+}
+
 const getConstitutionColor = type => {
   const constitution = constitutionTypes.value.find(c => c.type === type)
   return constitution ? constitution.color : '#8B6F47'
@@ -780,11 +808,17 @@ const goToRecommendation = () => {
 }
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
   // 检查用户是否已有体质信息
+  if (userStore.hasConstitution && !userStore.constitutionInfo) {
+    // 如果有体质类型但没有详细信息，获取详细信息
+    await userStore.fetchConstitutionInfo(userStore.constitution.type)
+  }
+
   if (userStore.hasConstitution) {
-    // 如果已有体质信息，可以选择查看历史结果或重新测评
-    // 这里暂时让用户选择
+    // 直接显示已保存的体质结果
+    showResult.value = true
+    hasStarted.value = false
   }
 })
 </script>
