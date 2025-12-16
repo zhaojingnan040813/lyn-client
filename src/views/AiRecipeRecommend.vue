@@ -1,32 +1,5 @@
 <template>
   <div class="ai-recommend-page">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-text">
-          <h1 class="page-title">
-            <span class="title-icon">🤖</span>
-            AI 智能推荐
-          </h1>
-          <p class="page-subtitle">基于您的体质特征和饮食偏好，为您量身定制健康菜谱</p>
-        </div>
-        <div class="header-stats" v-if="recommendStats">
-          <div class="stat-item">
-            <span class="stat-value">{{ recommendStats.totalRecommended }}</span>
-            <span class="stat-label">已推荐</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ recommendStats.saved }}</span>
-            <span class="stat-label">已保存</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ recommendStats.matchRate }}%</span>
-            <span class="stat-label">匹配率</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="page-content">
       <div class="content-layout">
         <!-- 左侧：推荐配置面板 -->
@@ -158,8 +131,7 @@ import {
   batchViewportAnimation,
   fadeIn,
   slideIn,
-  scale,
-  countUp
+  scale
 } from '@/utils/animations'
 
 // 组件导入
@@ -363,14 +335,6 @@ onMounted(async () => {
 
 // 初始化动画效果
 const initializeAnimations = () => {
-  // 页面头部统计数字动画
-  const statElements = document.querySelectorAll('.stat-value')
-  statElements.forEach(el => {
-    if (el.textContent && !isNaN(parseInt(el.textContent))) {
-      countUp(el, parseInt(el.textContent), 1500, 0)
-    }
-  })
-
   // 视口动画
   const analysisCard = document.querySelector('.analysis-card')
   if (analysisCard) {
@@ -429,75 +393,6 @@ const observeRecipeCards = () => {
 .ai-recommend-page {
   min-height: calc(100vh - var(--header-height));
   background: linear-gradient(135deg, var(--color-bg-primary), #f8f9fa);
-}
-
-/* 页面头部 */
-.page-header {
-  background: var(--color-bg-elevated);
-  border-bottom: 1px solid var(--color-border-light);
-  padding: var(--spacing-xl) 0;
-  position: sticky;
-  top: var(--header-height);
-  z-index: 10;
-  backdrop-filter: blur(var(--blur-sm));
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-xl);
-}
-
-.header-text {
-  flex: 1;
-}
-
-.page-title {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--text-3xl);
-  font-weight: var(--font-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.title-icon {
-  font-size: var(--text-4xl);
-}
-
-.page-subtitle {
-  color: var(--color-text-secondary);
-  font-size: var(--text-lg);
-  margin: 0;
-  line-height: var(--leading-relaxed);
-}
-
-.header-stats {
-  display: flex;
-  gap: var(--spacing-xl);
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.stat-value {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: var(--color-accent);
-}
-
-.stat-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
 }
 
 /* 页面内容 */
@@ -830,43 +725,9 @@ const observeRecipeCards = () => {
   .config-section {
     position: static;
   }
-
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-lg);
-  }
-
-  .header-stats {
-    gap: var(--spacing-lg);
-  }
 }
 
 @media (max-width: 768px) {
-  .page-header {
-    padding: var(--spacing-lg) 0;
-  }
-
-  .header-content {
-    padding: 0 var(--spacing-lg);
-  }
-
-  .page-title {
-    font-size: var(--text-2xl);
-  }
-
-  .title-icon {
-    font-size: var(--text-3xl);
-  }
-
-  .page-subtitle {
-    font-size: var(--text-base);
-  }
-
-  .header-stats {
-    gap: var(--spacing-md);
-  }
-
   .content-layout {
     padding: 0 var(--spacing-lg);
   }
