@@ -23,12 +23,16 @@
 
         <!-- 用户操作区 -->
         <div class="header-actions">
-          <template v-if="userStore.isLoggedIn">
-            <button class="btn btn-ghost btn-sm" @click="handleProfile">
-              {{ userStore.user?.username || '用户' }}
-            </button>
+          <template v-if="userStore.sessionId">
+            <div class="user-info">
+              <span class="user-badge" v-if="userStore.isAdmin">管理员</span>
+              <span class="user-badge guest" v-else-if="!userStore.isLoggedIn">游客</span>
+              <button class="btn btn-ghost btn-sm" @click="handleProfile">
+                {{ userStore.username }}
+              </button>
+            </div>
             <button class="btn btn-secondary btn-sm" @click="handleLogout">
-              退出
+              {{ userStore.isLoggedIn ? '退出' : '登录' }}
             </button>
           </template>
           <template v-else>
@@ -83,15 +87,22 @@ const isMobile = ref(false)
 const showMobileMenu = ref(false)
 
 const menuItems = computed(() => {
-  if (!userStore.isLoggedIn) return []
+  if (!userStore.isLoggedIn && !userStore.sessionId) return []
   
-  return [
+  const items = [
     { path: '/ai-diagnosis', label: 'AI 问诊' },
     { path: '/constitution-diagnosis', label: '体质测评' },
     { path: '/recipe-recommendation', label: '菜谱浏览' },
     { path: '/ai-recipe-recommend', label: '智能推荐' },
     { path: '/taste-optimization', label: '偏好设置' }
   ]
+
+  // 管理员才能看到菜品管理
+  if (userStore.isAdmin) {
+    items.push({ path: '/dish-management', label: '菜品管理' })
+  }
+
+  return items
 })
 
 const handleScroll = () => {
@@ -115,8 +126,13 @@ const handleProfile = () => {
 }
 
 const handleLogout = async () => {
-  await userStore.logout()
-  router.push('/login')
+  if (userStore.isLoggedIn) {
+    await userStore.logout()
+    router.push('/login')
+  } else {
+    // 游客点击登录按钮
+    router.push('/login')
+  }
 }
 
 onMounted(() => {
@@ -234,6 +250,25 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.user-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-full);
+}
+
+.user-badge.guest {
+  background: var(--color-text-tertiary);
 }
 
 /* 移动端菜单按钮 */

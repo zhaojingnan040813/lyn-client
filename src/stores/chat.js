@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { sendMessage, sendMessageStream } from '../api/chat.js'
+import { sendMessage as sendMessageApi, sendMessageStream as sendMessageStreamApi } from '../api/chat.js'
 
 export const useChatStore = defineStore('chat', () => {
   // 聊天消息列表
@@ -40,20 +40,38 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 发送消息（普通模式）
    * @param {string} content - 消息内容
+   * @param {Array} history - 历史记录
    */
-  const send = async content => {
-    if (!content.trim() || loading.value) return
+  const sendMessage = async (content, history = []) => {
+    if (!content.trim() || loading.value) {
+      console.warn('消息为空或正在加载中')
+      return null
+    }
 
-    // 添加用户消息
-    addMessage('user', content)
     loading.value = true
 
     try {
-      const response = await sendMessage(content, formattedHistory.value.slice(0, -1))
-      addMessage('assistant', response.data.reply)
+      console.log('发送消息到 AI:', { content, historyLength: history.length })
+      const response = await sendMessageApi(content, history)
+      console.log('AI 响应:', response)
+      
+      // API 返回的数据结构是 { code, message, data: { reply } }
+      // 响应拦截器已经返回了 response.data，所以这里的 response 就是后端返回的完整对象
+      if (response && response.code === 0 && response.data) {
+        return response
+      } else {
+        throw new Error(response?.message || 'AI 响应格式错误')
+      }
     } catch (error) {
       console.error('发送消息失败:', error)
-      addMessage('assistant', '抱歉，AI 服务暂时不可用，请稍后再试。111')
+      // 如果是网络错误或其他错误，抛出更友好的错误信息
+      if (error.message === 'Network Error') {
+        throw new Error('网络连接失败，请检查网络设置')
+      } else if (error.response) {
+        throw new Error(error.response.data?.message || '服务器错误')
+      } else {
+        throw new Error(error.message || 'AI 服务暂时不可用')
+      }
     } finally {
       loading.value = false
     }
@@ -62,36 +80,37 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 发送消息（流式模式）
    * @param {string} content - 消息内容
+   * @param {Array} history - 历史记录
+   * @param {Object} callbacks - 回调函数
    */
-  const sendStream = async content => {
-    if (!content.trim() || loading.value) return
+  const sendStreamMessage = async (content, history = [], callbacks = {}) => {
+    if (!content.trim() || loading.value) {
+      console.warn('消息为空或正在加载中')
+      return
+    }
 
-    // 添加用户消息
-    addMessage('user', content)
     loading.value = true
-    currentReply.value = ''
-
-    // 添加一个空的 AI 消息占位
-    const aiMessageIndex = messages.value.length
-    addMessage('assistant', '')
 
     try {
-      await sendMessageStream(content, formattedHistory.value.slice(0, -1), {
-        onMessage: chunk => {
-          currentReply.value += chunk
-          messages.value[aiMessageIndex].content = currentReply.value
+      console.log('发送流式消息到 AI:', { content, historyLength: history.length })
+      
+      await sendMessageStreamApi(content, history, {
+        onMessage: (chunk) => {
+          console.log('收到流式数据块:', chunk)
+          callbacks.onMessage?.(chunk)
         },
-        onError: error => {
+        onError: (error) => {
           console.error('流式消息错误:', error)
-          messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。111'
+          callbacks.onError?.(error)
         },
         onComplete: () => {
-          currentReply.value = ''
+          console.log('流式消息完成')
+          callbacks.onComplete?.()
         }
       })
     } catch (error) {
-      console.error('发送消息失败:', error)
-      messages.value[aiMessageIndex].content = '抱歉，AI 服务暂时不可用，请稍后再试。111'
+      console.error('发送流式消息失败:', error)
+      callbacks.onError?.(error)
     } finally {
       loading.value = false
     }
@@ -111,8 +130,8 @@ export const useChatStore = defineStore('chat', () => {
     currentReply,
     hasMessages,
     addMessage,
-    send,
-    sendStream,
+    sendMessage,
+    sendStreamMessage,
     clearMessages
   }
 })

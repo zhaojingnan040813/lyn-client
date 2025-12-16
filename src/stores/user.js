@@ -68,49 +68,65 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 用户注册
-  const register = async (username, password) => {
+  const register = async (data) => {
     try {
       loading.value = true
       error.value = null
-      const response = await authApi.register(username, password)
+      const response = await authApi.register(data.username, data.password)
       if (response.code === 0) {
         // 注册成功后自动登录
         sessionId.value = response.data.sessionId
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
         localStorage.setItem('sessionId', sessionId.value)
-        return { success: true, message: '注册成功' }
+        return response.data
       } else {
-        return { success: false, message: response.message || '注册失败' }
+        throw new Error(response.message || '注册失败')
       }
     } catch (err) {
-      error.value = err.message || err.data?.message || '注册失败'
+      error.value = err.message || err.response?.data?.message || '注册失败'
       console.error('Failed to register:', err)
-      return { success: false, message: error.value }
+      throw new Error(error.value)
     } finally {
       loading.value = false
     }
   }
 
   // 用户登录
-  const login = async (username, password) => {
+  const login = async (data) => {
     try {
       loading.value = true
       error.value = null
-      const response = await authApi.login(username, password)
+      const response = await authApi.login(data.username, data.password)
       if (response.code === 0) {
         sessionId.value = response.data.sessionId
         userInfo.value = response.data.user
         constitution.value = response.data.user.constitution
         localStorage.setItem('sessionId', sessionId.value)
-        return { success: true, message: '登录成功' }
+        return response.data
       } else {
-        return { success: false, message: response.message || '登录失败' }
+        throw new Error(response.message || '登录失败')
       }
     } catch (err) {
-      error.value = err.message || err.data?.message || '登录失败'
+      error.value = err.message || err.response?.data?.message || '登录失败'
       console.error('Failed to login:', err)
-      return { success: false, message: error.value }
+      throw new Error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 游客登录（创建匿名会话）
+  const guestLogin = async () => {
+    try {
+      loading.value = true
+      error.value = null
+      await createSession()
+      return userInfo.value
+    } catch (err) {
+      error.value = err.message || '游客登录失败'
+      console.error('Failed to guest login:', err)
+      throw new Error(error.value)
     } finally {
       loading.value = false
     }
@@ -263,11 +279,13 @@ export const useUserStore = defineStore('user', () => {
     isAdmin,
     hasConstitution,
     username,
+    user: userInfo,
     // 方法
     initSession,
     createSession,
     register,
     login,
+    guestLogin,
     logout,
     fetchUserInfo,
     changePassword,

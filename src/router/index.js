@@ -51,7 +51,8 @@ const routes = [
     component: () => import('../views/DishManagement.vue'),
     meta: {
       title: '菜品管理 - 智能体质膳食推荐系统',
-      requiresAuth: true // 需要登录
+      requiresAuth: true, // 需要登录
+      requiresAdmin: true // 需要管理员权限
     }
   },
   {
@@ -101,6 +102,14 @@ const routes = [
       title: '个人信息 - 智能体质膳食推荐系统',
       requiresAuth: true // 需要登录
     }
+  },
+  {
+    path: '/test-chat',
+    name: 'TestChat',
+    component: () => import('../views/TestChat.vue'),
+    meta: {
+      title: '测试页面 - 智能体质膳食推荐系统'
+    }
   }
 ]
 
@@ -132,6 +141,16 @@ router.beforeEach(async (to, from, next) => {
       next({
         path: '/login',
         query: { redirect: to.fullPath } // 保存重定向路径
+      })
+      return
+    }
+
+    // 检查管理员权限
+    if (to.meta.requiresAdmin && !userStore.isAdmin) {
+      // 需要管理员权限但不是管理员，跳转到首页并提示
+      next({
+        path: '/ai-diagnosis',
+        replace: true
       })
       return
     }
