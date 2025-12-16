@@ -9,61 +9,78 @@ export const useRecipeStore = defineStore('recipe', () => {
   const categories = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const hasMore = ref(true)
 
   // 筛选和分页状态
   const currentCategory = ref('recommended')
   const searchKeyword = ref('')
   const pagination = ref({
     page: 1,
-    pageSize: 10,
+    pageSize: 12,
     total: 0
   })
 
-  // ========== 计算属性 ==========
-  const hasMore = computed(() => {
-    return recipes.value.length < pagination.value.total
-  })
+  // 收藏状态
+  const favorites = ref(new Set())
 
+  // ========== 计算属性 ==========
   const isEmpty = computed(() => {
     return !loading.value && recipes.value.length === 0
+  })
+
+  const filteredRecipes = computed(() => {
+    return recipes.value
   })
 
   // ========== 方法 ==========
 
   /**
    * 获取菜谱列表
-   * @param {boolean} append - 是否追加到现有列表（用于加载更多）
+   * @param {Object} params - 查询参数
    */
-  const fetchRecipes = async (append = false) => {
+  const fetchRecipes = async (params = {}) => {
     loading.value = true
     error.value = null
 
     try {
-      const params = {
-        category: currentCategory.value,
-        page: append ? pagination.value.page + 1 : 1,
-        pageSize: pagination.value.pageSize
+      const queryParams = {
+        page: params.page || pagination.value.page,
+        pageSize: params.pageSize || pagination.value.pageSize,
+        keyword: params.keyword || searchKeyword.value,
+        category: params.category || currentCategory.value,
+        sortBy: params.sortBy || 'matchScore',
+        sortOrder: params.sortOrder || 'desc',
+        ...params.filters
       }
 
-      if (searchKeyword.value) {
-        params.keyword = searchKeyword.value
-      }
-
-      const response = await recipeApi.getRecipes(params)
+      const response = await recipeApi.getRecipes(queryParams)
 
       if (response.code === 0) {
-        if (append) {
-          recipes.value = [...recipes.value, ...response.data.list]
+        const newRecipes = response.data.list || []
+
+        // 如果是追加（加载更多），合并数据
+        if (params.append) {
+          recipes.value = [...recipes.value, ...newRecipes]
         } else {
-          recipes.value = response.data.list
+          recipes.value = newRecipes
         }
-        pagination.value = response.data.pagination
+
+        pagination.value = response.data.pagination || {
+          page: queryParams.page,
+          pageSize: queryParams.pageSize,
+          total: newRecipes.length
+        }
+
+        hasMore.value = recipes.value.length < pagination.value.total
+
+        return response.data
       } else {
         throw new Error(response.message || '获取菜谱失败')
       }
     } catch (err) {
       error.value = err.message
       console.error('获取菜谱列表失败:', err)
+      throw err
     } finally {
       loading.value = false
     }
@@ -73,7 +90,7 @@ export const useRecipeStore = defineStore('recipe', () => {
    * 获取菜谱详情
    * @param {string} id - 菜谱ID
    */
-  const fetchRecipeById = async id => {
+  const fetchRecipeDetail = async id => {
     loading.value = true
     error.value = null
 
@@ -82,6 +99,13 @@ export const useRecipeStore = defineStore('recipe', () => {
 
       if (response.code === 0) {
         currentRecipe.value = response.data
+
+        // 更新列表中的菜谱数据
+        const index = recipes.value.findIndex(recipe => recipe.id === id)
+        if (index !== -1) {
+          recipes.value[index] = { ...recipes.value[index], ...response.data }
+        }
+
         return response.data
       } else {
         throw new Error(response.message || '获取菜谱详情失败')
@@ -89,7 +113,104 @@ export const useRecipeStore = defineStore('recipe', () => {
     } catch (err) {
       error.value = err.message
       console.error('获取菜谱详情失败:', err)
-      return null
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * 获取推荐菜谱
+   * @param {Object} params - 推荐参数
+   */
+  const fetchRecommendations = async (params = {}) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await recipeApi.getRecommendations({
+        limit: params.limit || 6,
+        ...params
+      })
+
+      if (response.code === 0) {
+        return response.data.list || []
+      } else {
+        throw new Error(response.message || '获取推荐菜谱失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('获取推荐菜谱失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * 获取AI智能推荐
+   * @param {Object} params - AI推荐参数
+   */
+  const fetchAiRecommendations = async (params = {}) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await recipeApi.getAiRecommendations({
+        mealType: params.mealType || 'dinner',
+        count: params.count || 6,
+        excludeIngredients: params.excludeIngredients || [],
+        specialRequirements: params.specialRequirements || '',
+        ...params
+      })
+
+      if (response.code === 0) {
+        const aiRecipes = response.data.list || []
+
+        // 将AI推荐结果合并到菜谱列表
+        recipes.value = [...aiRecipes, ...recipes.value]
+
+        return aiRecipes
+      } else {
+        throw new Error(response.message || 'AI推荐失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('AI推荐失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * 获取个性化推荐
+   */
+  const fetchPersonalizedRecommendations = async () => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await recipeApi.getRecommendations({
+        limit: 6
+      })
+
+      if (response.code === 0) {
+        const personalizedRecipes = response.data.list || []
+
+        // 如果当前是推荐分类，更新列表
+        if (currentCategory.value === 'recommended') {
+          recipes.value = personalizedRecipes
+        }
+
+        return personalizedRecipes
+      } else {
+        throw new Error(response.message || '获取个性化推荐失败')
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('获取个性化推荐失败:', err)
+      throw err
     } finally {
       loading.value = false
     }
@@ -103,23 +224,89 @@ export const useRecipeStore = defineStore('recipe', () => {
       const response = await recipeApi.getCategories()
 
       if (response.code === 0) {
-        categories.value = response.data.categories
+        categories.value = response.data.categories || []
+        return response.data.categories
       }
     } catch (err) {
       console.error('获取分类统计失败:', err)
+      return []
     }
   }
 
   /**
-   * 切换分类
-   * @param {string} category - 分类key
+   * 切换收藏状态
+   * @param {string} recipeId - 菜谱ID
+   * @param {boolean} isFavorited - 是否收藏
    */
-  const setCategory = async category => {
-    if (currentCategory.value === category) return
+  const toggleFavorite = async (recipeId, isFavorited) => {
+    try {
+      if (isFavorited) {
+        favorites.value.add(recipeId)
+        // 这里可以调用API添加收藏
+        // await recipeApi.addFavorite(recipeId)
+      } else {
+        favorites.value.delete(recipeId)
+        // 这里可以调用API取消收藏
+        // await recipeApi.removeFavorite(recipeId)
+      }
+    } catch (err) {
+      console.error('收藏操作失败:', err)
+      throw err
+    }
+  }
 
-    currentCategory.value = category
-    pagination.value.page = 1
-    await fetchRecipes()
+  /**
+   * 检查菜谱是否已收藏
+   * @param {string} recipeId - 菜谱ID
+   */
+  const isFavorited = recipeId => {
+    return favorites.value.has(recipeId)
+  }
+
+  /**
+   * 分享菜谱
+   * @param {string} recipeId - 菜谱ID
+   */
+  const shareRecipe = async recipeId => {
+    try {
+      // 这里可以调用API记录分享行为
+      // await recipeApi.shareRecipe(recipeId)
+
+      const recipe = recipes.value.find(r => r.id === recipeId)
+      if (recipe) {
+        const shareUrl = `${window.location.origin}/recipe/${recipeId}`
+
+        if (navigator.share) {
+          await navigator.share({
+            title: recipe.name,
+            text: recipe.description,
+            url: shareUrl
+          })
+        } else {
+          await navigator.clipboard.writeText(shareUrl)
+          return { type: 'clipboard', url: shareUrl }
+        }
+      }
+    } catch (err) {
+      console.error('分享失败:', err)
+      throw err
+    }
+  }
+
+  /**
+   * 加载更多
+   */
+  const loadMore = async () => {
+    if (loading.value || !hasMore.value) return
+
+    try {
+      await fetchRecipes({
+        page: pagination.value.page + 1,
+        append: true
+      })
+    } catch (err) {
+      console.error('加载更多失败:', err)
+    }
   }
 
   /**
@@ -128,16 +315,10 @@ export const useRecipeStore = defineStore('recipe', () => {
    */
   const search = async keyword => {
     searchKeyword.value = keyword
-    pagination.value.page = 1
-    await fetchRecipes()
-  }
-
-  /**
-   * 加载更多
-   */
-  const loadMore = async () => {
-    if (loading.value || !hasMore.value) return
-    await fetchRecipes(true)
+    await fetchRecipes({
+      keyword,
+      page: 1
+    })
   }
 
   /**
@@ -150,10 +331,11 @@ export const useRecipeStore = defineStore('recipe', () => {
     searchKeyword.value = ''
     pagination.value = {
       page: 1,
-      pageSize: 10,
+      pageSize: 12,
       total: 0
     }
     error.value = null
+    hasMore.value = true
   }
 
   /**
@@ -222,21 +404,28 @@ export const useRecipeStore = defineStore('recipe', () => {
     categories,
     loading,
     error,
+    hasMore,
     currentCategory,
     searchKeyword,
     pagination,
+    favorites,
 
     // 计算属性
-    hasMore,
     isEmpty,
+    filteredRecipes,
 
     // 方法
     fetchRecipes,
-    fetchRecipeById,
+    fetchRecipeDetail,
+    fetchRecommendations,
+    fetchAiRecommendations,
+    fetchPersonalizedRecommendations,
     fetchCategories,
-    setCategory,
-    search,
+    toggleFavorite,
+    isFavorited,
+    shareRecipe,
     loadMore,
+    search,
     reset,
     clearCurrentRecipe,
     generateRecipeByAI,

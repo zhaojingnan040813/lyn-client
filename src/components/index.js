@@ -16,3 +16,10 @@ export { default as QuestionOption } from './constitution/QuestionOption.vue'
 export { default as QuestionCard } from './constitution/QuestionCard.vue'
 export { default as RadarChart } from './constitution/RadarChart.vue'
 export { default as AdviceCard } from './constitution/AdviceCard.vue'
+
+// 菜谱相关组件
+export { default as RecipeCard } from './recipe/RecipeCard.vue'
+export { default as RecipeFilters } from './recipe/RecipeFilters.vue'
+export { default as RecipeGrid } from './recipe/RecipeGrid.vue'
+export { default as RecipeDetailModal } from './recipe/RecipeDetailModal.vue'
+export { default as EmptyState } from './recipe/EmptyState.vue'
