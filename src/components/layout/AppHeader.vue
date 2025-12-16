@@ -25,7 +25,7 @@
         <div class="header-actions">
           <template v-if="userStore.sessionId">
             <div class="user-info">
-              <span class="user-badge" v-if="userStore.isAdmin">管理员</span>
+              <span class="user-badge" v-if="isAdminFromStorage">管理员</span>
               <button class="btn btn-ghost btn-sm" @click="handleProfile">
                 {{ userStore.username }}
               </button>
@@ -79,6 +79,20 @@ const isScrolled = ref(false)
 const isMobile = ref(false)
 const showMobileMenu = ref(false)
 
+// 直接从localStorage判断用户角色的计算属性
+const isAdminFromStorage = computed(() => {
+  const sessionId = localStorage.getItem('sessionId')
+  if (!sessionId) return false
+
+  try {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+    return userInfo.role === 'admin'
+  } catch (error) {
+    console.warn('Failed to parse userInfo from localStorage:', error)
+    return false
+  }
+})
+
 const menuItems = computed(() => {
   if (!userStore.isLoggedIn && !userStore.sessionId) return []
 
@@ -90,8 +104,9 @@ const menuItems = computed(() => {
     { path: '/preference-settings', label: '偏好设置' }
   ]
 
-  // 管理员才能看到菜品管理
-  if (userStore.isAdmin) {
+  // 管理员才能看到菜品管理 - 直接从localStorage判断
+  if (isAdminFromStorage.value) {
+    console.log('测试')
     items.push({ path: '/dish-management', label: '菜品管理' })
   }
 
