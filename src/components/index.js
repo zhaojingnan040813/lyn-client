@@ -14,6 +14,7 @@ export { default as Toast } from './common/Toast.vue'
 // 体质设置组件
 export { default as QuestionOption } from './constitution/QuestionOption.vue'
 export { default as ConstitutionCard } from './constitution/ConstitutionCard.vue'
+export { default as ConstitutionDetailModal } from './constitution/ConstitutionDetailModal.vue'
 export { default as ConstitutionQuestion } from './constitution/ConstitutionQuestion.vue'
 
 // 菜谱相关组件

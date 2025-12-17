@@ -68,11 +68,28 @@
       </div>
       <div class="score-text">{{ score }}%</div>
     </div>
+
+    <!-- 查看详情按钮 -->
+    <div class="card-actions">
+      <button class="btn btn-outline btn-sm" @click.stop="showDetails">
+        <span class="btn-icon">📋</span>
+        查看详情
+      </button>
+    </div>
   </div>
+
+  <!-- 体质详情弹窗 -->
+  <ConstitutionDetailModal
+    :constitution="constitution"
+    :is-visible="isDetailModalVisible"
+    :on-select="onDetailSelect"
+    @close="hideDetails"
+  />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import ConstitutionDetailModal from './ConstitutionDetailModal.vue'
 
 const props = defineProps({
   constitution: {
@@ -118,15 +135,39 @@ const props = defineProps({
   maxAvoidFoods: {
     type: Number,
     default: 4
+  },
+  allowDetail: {
+    type: Boolean,
+    default: true
   }
 })
 
 const emit = defineEmits(['select'])
 
+// 弹窗相关
+const isDetailModalVisible = ref(false)
+
 const handleSelect = () => {
   if (!props.disabled) {
     emit('select', props.constitution)
   }
+}
+
+// 显示详情弹窗
+const showDetails = () => {
+  if (props.allowDetail) {
+    isDetailModalVisible.value = true
+  }
+}
+
+// 隐藏详情弹窗
+const hideDetails = () => {
+  isDetailModalVisible.value = false
+}
+
+// 从详情弹窗选择体质
+const onDetailSelect = constitutionDetail => {
+  emit('select', constitutionDetail)
 }
 
 // 限制显示的特征数量
@@ -382,6 +423,45 @@ const displayAvoidFoods = computed(() => {
 .constitution-card.compact .match-score {
   margin-top: var(--spacing-sm);
   padding-top: var(--spacing-sm);
+}
+
+/* 卡片操作区域 */
+.card-actions {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--transition-base) var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.btn-outline:hover {
+  background: var(--color-primary-alpha);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-sm {
+  font-size: var(--text-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.btn-icon {
+  font-size: var(--text-sm);
 }
 
 /* 响应式 */
