@@ -173,17 +173,15 @@
 
                   <!-- 营养信息 -->
                   <div v-if="activeTab === 'nutrition'" class="tab-panel">
-                    <div v-if="recipe.nutrition" class="nutrition-section">
-                      <h3 class="section-title">营养信息</h3>
-                      <div class="nutrition-grid">
-                        <div
-                          v-for="(value, key) in recipe.nutrition"
-                          :key="key"
-                          class="nutrition-item"
-                        >
-                          <span class="nutrition-label">{{ getNutritionLabel(key) }}</span>
-                          <span class="nutrition-value">{{ value }}</span>
-                        </div>
+                    <div
+                      v-if="recipe.nutritionTags && recipe.nutritionTags.length"
+                      class="nutrition-section"
+                    >
+                      <h3 class="section-title">营养特点</h3>
+                      <div class="nutrition-tags-list">
+                        <span v-for="tag in recipe.nutritionTags" :key="tag" class="nutrition-tag">
+                          {{ tag }}
+                        </span>
                       </div>
                     </div>
                     <div v-else class="empty-section">
@@ -193,34 +191,40 @@
 
                   <!-- AI推荐理由 -->
                   <div v-if="activeTab === 'ai'" class="tab-panel">
-                    <div v-if="recipe.aiRecommendation" class="ai-section">
+                    <div
+                      v-if="recipe.recommendReason || recipe.healthBenefits || recipe.bestMealTime"
+                      class="ai-section"
+                    >
                       <h3 class="section-title">
                         <span class="ai-icon">🤖</span>
-                        AI智能推荐理由
+                        AI智能推荐分析
                       </h3>
-                      <div v-if="recipe.aiRecommendation.reason" class="ai-reason">
+                      <div v-if="recipe.recommendReason" class="ai-reason">
                         <h4 class="reason-title">推荐理由</h4>
-                        <p class="reason-content">{{ recipe.aiRecommendation.reason }}</p>
+                        <p class="reason-content">{{ recipe.recommendReason }}</p>
                       </div>
-                      <div v-if="recipe.aiRecommendation.nutritionTags" class="ai-tags">
-                        <h4 class="tags-title">营养分析</h4>
+                      <div v-if="recipe.healthBenefits" class="ai-benefits">
+                        <h4 class="benefits-title">健康益处</h4>
+                        <p class="benefits-content">{{ recipe.healthBenefits }}</p>
+                      </div>
+                      <div
+                        v-if="recipe.nutritionTags && recipe.nutritionTags.length"
+                        class="ai-tags"
+                      >
+                        <h4 class="tags-title">营养标签</h4>
                         <div class="ai-tags-list">
-                          <span
-                            v-for="tag in recipe.aiRecommendation.nutritionTags"
-                            :key="tag"
-                            class="ai-tag"
-                          >
+                          <span v-for="tag in recipe.nutritionTags" :key="tag" class="ai-tag">
                             {{ tag }}
                           </span>
                         </div>
                       </div>
-                      <div v-if="recipe.aiRecommendation.bestMealTime" class="ai-meal-time">
+                      <div v-if="recipe.bestMealTime" class="ai-meal-time">
                         <h4 class="meal-time-title">最佳用餐时间</h4>
-                        <p class="meal-time-content">{{ recipe.aiRecommendation.bestMealTime }}</p>
+                        <p class="meal-time-content">{{ recipe.bestMealTime }}</p>
                       </div>
-                      <div v-if="recipe.aiRecommendation.seasonalAdvice" class="ai-seasonal">
+                      <div v-if="recipe.seasonalAdvice" class="ai-seasonal">
                         <h4 class="seasonal-title">季节建议</h4>
-                        <p class="seasonal-content">{{ recipe.aiRecommendation.seasonalAdvice }}</p>
+                        <p class="seasonal-content">{{ recipe.seasonalAdvice }}</p>
                       </div>
                     </div>
                     <div v-else class="empty-section">
@@ -852,6 +856,7 @@ watch(
 }
 
 .ai-reason,
+.ai-benefits,
 .ai-tags,
 .ai-meal-time,
 .ai-seasonal {
@@ -862,6 +867,7 @@ watch(
 }
 
 .reason-title,
+.benefits-title,
 .tags-title,
 .meal-time-title,
 .seasonal-title {
@@ -872,6 +878,7 @@ watch(
 }
 
 .reason-content,
+.benefits-content,
 .meal-time-content,
 .seasonal-content {
   color: var(--color-text-secondary);

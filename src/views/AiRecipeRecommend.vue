@@ -44,14 +44,6 @@
                 <p>为您找到 {{ recommendedRecipes.length }} 道适合的菜谱</p>
               </div>
               <div class="results-actions">
-                <button
-                  class="action-btn save-all-btn"
-                  :disabled="recommendedRecipes.length === 0"
-                  @click="handleSaveAll"
-                >
-                  <span class="btn-icon">💾</span>
-                  保存AI生成结果
-                </button>
                 <button class="action-btn refresh-btn" @click="handleRefresh">
                   <span class="btn-icon">🔄</span>
                   重新推荐
@@ -81,14 +73,6 @@
       </div>
     </div>
 
-    <!-- 菜谱保存弹窗 -->
-    <RecipeSaveModal
-      :recipe="selectedRecipe"
-      :is-visible="isSaveModalVisible"
-      @close="closeSaveModal"
-      @save="handleSaveConfirm"
-    />
-
     <!-- 菜谱详情弹窗 -->
     <RecipeDetailModal
       :recipe="detailRecipe"
@@ -99,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/utils/toast'
 import { useRecipeStore } from '@/stores/recipe'
@@ -117,7 +101,6 @@ import {
 import AiRecommendPanel from '@/components/recipe/AiRecommendPanel.vue'
 import AiAnalysisCard from '@/components/recipe/AiAnalysisCard.vue'
 import RecipeCard from '@/components/recipe/RecipeCard.vue'
-import RecipeSaveModal from '@/components/recipe/RecipeSaveModal.vue'
 import RecipeDetailModal from '@/components/recipe/RecipeDetailModal.vue'
 
 const router = useRouter()
@@ -129,17 +112,8 @@ const userStore = useUserStore()
 const isRecommending = ref(false)
 const recommendedRecipes = ref([])
 const aiAnalysis = ref(null)
-const selectedRecipe = ref(null)
 const detailRecipe = ref(null)
-const isSaveModalVisible = ref(false)
 const isDetailModalVisible = ref(false)
-
-// 推荐统计
-const recommendStats = reactive({
-  totalRecommended: 0,
-  saved: 0,
-  matchRate: 0
-})
 
 // 计算属性
 const hasRecommended = computed(() => recommendedRecipes.value.length > 0)
@@ -174,10 +148,6 @@ const handleRecommend = async params => {
           }
         }
 
-        // 更新统计
-        recommendStats.totalRecommended += recipes.length
-        updateMatchRate()
-
         toast.success(`AI为您推荐了 ${recipes.length} 道菜谱`)
       } else {
         toast.warning('暂无符合条件的推荐，请调整推荐条件')
@@ -209,57 +179,6 @@ const handleRecipeShare = recipe => {
   recipeStore.shareRecipe(recipe._id)
 }
 
-// 处理批量保存
-const handleSaveAll = async () => {
-  const recipesToSave = recommendedRecipes.value.filter(recipe => !recipe.saved)
-
-  if (recipesToSave.length === 0) {
-    toast.info('所有菜谱都已保存')
-    return
-  }
-
-  try {
-    for (const recipe of recipesToSave) {
-      await recipeStore.saveAIGeneratedRecipe({
-        name: recipe.name,
-        description: recipe.description,
-        nature: '平', // 默认值，用户可以在保存弹窗中修改
-        ingredients: [], // 需要从AI推荐中提取
-        steps: [] // 需要从AI推荐中提取
-      })
-      recipe.saved = true
-    }
-
-    recommendStats.saved += recipesToSave.length
-
-    toast.success(`成功保存 ${recipesToSave.length} 道菜谱`)
-  } catch (error) {
-    console.error('批量保存失败:', error)
-    toast.error('保存失败，请重试')
-  }
-}
-
-// 处理保存确认
-const handleSaveConfirm = async saveData => {
-  try {
-    await recipeStore.saveAIGeneratedRecipe(saveData)
-
-    // 标记为已保存
-    const recipe = recommendedRecipes.value.find(r => r._id === selectedRecipe.value._id)
-    if (recipe) {
-      recipe.saved = true
-    }
-
-    recommendStats.saved++
-    closeSaveModal()
-
-    toast.success('菜谱保存成功！')
-  } catch (error) {
-    console.error('保存失败:', error)
-    toast.error('保存失败，请重试')
-  }
-}
-
 // 处理刷新推荐
 const handleRefresh = () => {
   recommendedRecipes.value = []
@@ -269,29 +188,10 @@ const handleRefresh = () => {
   toast.info('请重新配置推荐条件')
 }
 
-// 关闭保存弹窗
-const closeSaveModal = () => {
-  isSaveModalVisible.value = false
-  selectedRecipe.value = null
-}
-
 // 关闭详情弹窗
 const closeDetailModal = () => {
   isDetailModalVisible.value = false
   detailRecipe.value = null
-}
-
-// 更新匹配率
-const updateMatchRate = () => {
-  if (recommendedRecipes.value.length === 0) {
-    recommendStats.matchRate = 0
-    return
-  }
-
-  const avgScore =
-    recommendedRecipes.value.reduce((sum, recipe) => sum + (recipe.matchScore || 0), 0) /
-    recommendedRecipes.value.length
-  recommendStats.matchRate = Math.round(avgScore)
 }
 
 // 组件挂载时的初始化
@@ -543,21 +443,6 @@ const observeRecipeCards = () => {
   transition: all var(--transition-base);
 }
 
-.save-all-btn {
-  background: var(--gradient-accent);
-  color: white;
-}
-
-.save-all-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.save-all-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .refresh-btn {
   background: var(--color-bg-secondary);
   color: var(--color-text-secondary);
@@ -591,34 +476,6 @@ const observeRecipeCards = () => {
   right: var(--spacing-md);
   z-index: 2;
 } */
-
-.save-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: all var(--transition-base);
-  backdrop-filter: blur(var(--blur-sm));
-}
-
-.save-btn:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: white;
-  transform: scale(1.05);
-}
-
-.save-btn.is-saved {
-  background: var(--color-success);
-  border-color: var(--color-success);
-  color: white;
-}
 
 /* 动画 */
 @keyframes slideInRight {
