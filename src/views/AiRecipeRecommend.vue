@@ -84,7 +84,7 @@
                   @share="handleRecipeShare"
                 />
 
-                <div class="recipe-actions">
+                <!-- <div class="recipe-actions">
                   <button
                     class="save-btn"
                     :class="{ 'is-saved': recipe.saved }"
@@ -94,7 +94,7 @@
                     <span v-else>✅</span>
                     {{ recipe.saved ? '已保存' : '保存' }}
                   </button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -648,12 +648,12 @@ const observeRecipeCards = () => {
   font-weight: var(--font-bold);
 }
 
-.recipe-actions {
+/* .recipe-actions {
   position: absolute;
   bottom: var(--spacing-md);
   right: var(--spacing-md);
   z-index: 2;
-}
+} */
 
 .save-btn {
   display: flex;

@@ -38,7 +38,7 @@
           推荐数量
         </label>
         <div class="count-selector">
-          <input v-model.number="form.count" type="range" min="3" max="12" class="count-slider" />
+          <input v-model.number="form.count" type="range" min="1" max="12" class="count-slider" />
           <div class="count-display">
             <span class="count-value">{{ form.count }}</span>
             <span class="count-unit">道菜</span>
