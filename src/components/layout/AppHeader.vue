@@ -99,9 +99,9 @@ const menuItems = computed(() => {
   const items = [
     { path: '/ai-diagnosis', label: 'AI 问诊' },
     { path: '/constitution-diagnosis', label: '体质设置' },
+    { path: '/preference-settings', label: '偏好设置' },
     { path: '/recipe-recommendation', label: '菜谱浏览' },
-    { path: '/ai-recipe-recommend', label: '智能推荐' },
-    { path: '/preference-settings', label: '偏好设置' }
+    { path: '/ai-recipe-recommend', label: '智能推荐' }
   ]
 
   // 管理员才能看到菜品管理 - 直接从localStorage判断
