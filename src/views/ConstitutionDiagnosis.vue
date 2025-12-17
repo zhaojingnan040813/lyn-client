@@ -64,7 +64,7 @@
             <h2 class="result-title">您的体质测评结果</h2>
             <p class="result-subtitle">
               {{
-                userStore.hasConstitution && !hasStarted
+                userStore.hasConstitution && !hasStarted && !isRestarting
                   ? '您已保存的体质信息'
                   : '基于您的回答，我们为您生成了个性化的体质分析'
               }}
@@ -135,7 +135,7 @@
             <!-- 操作按钮 -->
             <div class="result-actions">
               <button
-                v-if="!userStore.hasConstitution || hasStarted"
+                v-if="!userStore.hasConstitution || hasStarted || isRestarting"
                 class="btn btn-primary"
                 @click="saveResult"
               >
@@ -148,7 +148,12 @@
         </div>
 
         <!-- 开始测评区域 -->
-        <div class="start-container" v-if="!hasStarted && !loading && !userStore.hasConstitution">
+        <div
+          class="start-container"
+          v-if="
+            !hasStarted && !loading && !showResult && (!userStore.hasConstitution || isRestarting)
+          "
+        >
           <div class="start-card">
             <div class="start-icon">🔮</div>
             <h2>开始您的体质测评之旅</h2>
@@ -191,6 +196,7 @@ const toast = useToast()
 const hasStarted = ref(false)
 const loading = ref(false)
 const showResult = ref(false)
+const isRestarting = ref(false)
 const currentQuestionIndex = ref(0)
 const selectedOption = ref(null)
 const answers = ref([])
@@ -549,7 +555,7 @@ const currentQuestion = computed(() => {
 
 const primaryConstitution = computed(() => {
   // 如果用户已有保存的体质信息，直接显示
-  if (userStore.constitution?.type && !hasStarted.value) {
+  if (userStore.constitution?.type && !hasStarted.value && !isRestarting.value) {
     return {
       type: userStore.constitution.type,
       name: getConstitutionName(userStore.constitution.type),
@@ -624,6 +630,7 @@ const getConstitutionCharacteristics = type => {
 
 const startTest = () => {
   hasStarted.value = true
+  isRestarting.value = false
   currentQuestionIndex.value = 0
   answers.value = []
   selectedOption.value = null
@@ -692,6 +699,7 @@ const calculateResult = () => {
   setTimeout(() => {
     loading.value = false
     showResult.value = true
+    isRestarting.value = false
   }, 2000)
 }
 
@@ -699,6 +707,7 @@ const saveResult = async () => {
   try {
     await userStore.setConstitution(primaryConstitution.value.type, 'manual')
     toast.success('体质结果已保存')
+    isRestarting.value = false
   } catch (error) {
     toast.error('保存失败，请重试')
   }
@@ -711,6 +720,7 @@ const restartTest = () => {
   answers.value = []
   selectedOption.value = null
   constitutionScores.value = []
+  isRestarting.value = true
 }
 
 const getDietAdvice = type => {
@@ -811,14 +821,13 @@ const goToRecommendation = () => {
 onMounted(async () => {
   // 检查用户是否已有体质信息
   if (userStore.hasConstitution && !userStore.constitutionInfo) {
-    // 如果有体质类型但没有详细信息，获取详细信息
-    await userStore.fetchConstitutionInfo(userStore.constitution.type)
+    // 如果有体质类型但没有详细信息，通过会话ID获取用户的体质信息
+    await userStore.fetchUserConstitution()
   }
 
-  if (userStore.hasConstitution) {
+  if (userStore.hasConstitution && !hasStarted.value && !isRestarting.value) {
     // 直接显示已保存的体质结果
     showResult.value = true
-    hasStarted.value = false
   }
 })
 </script>

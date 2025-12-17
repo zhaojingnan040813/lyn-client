@@ -72,7 +72,7 @@ export const useUserStore = defineStore('user', () => {
 
             // 如果有体质，获取体质详情
             if (constitution.value?.type) {
-              await fetchConstitutionInfo(constitution.value.type)
+              await fetchUserConstitution()
             }
             return true
           }
@@ -340,6 +340,36 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 获取用户体质信息（通过会话ID）
+  const fetchUserConstitution = async () => {
+    if (!sessionId.value) {
+      console.warn('No session found, cannot fetch user constitution')
+      return null
+    }
+
+    try {
+      const response = await constitutionApi.getUserConstitution(sessionId.value)
+      if (response.code === 0) {
+        constitution.value = response.data.constitution
+        constitutionInfo.value = response.data.constitutionInfo
+
+        // 保存到localStorage
+        if (constitution.value) {
+          localStorage.setItem('constitution', JSON.stringify(constitution.value))
+        }
+        if (constitutionInfo.value) {
+          localStorage.setItem('constitutionInfo', JSON.stringify(constitutionInfo.value))
+        }
+
+        return response.data
+      }
+      return null
+    } catch (err) {
+      console.error('Failed to fetch user constitution:', err)
+      return null
+    }
+  }
+
   // 清除会话
   const clearSession = () => {
     sessionId.value = null
@@ -381,6 +411,7 @@ export const useUserStore = defineStore('user', () => {
     checkAuthStatus,
     setConstitution,
     fetchConstitutionInfo,
+    fetchUserConstitution,
     clearSession
   }
 })
