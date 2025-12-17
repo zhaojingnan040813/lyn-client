@@ -152,24 +152,38 @@ const handleRecommend = async params => {
     // 调用API获取AI推荐
     const response = await recipeStore.fetchAiRecommendations(params)
 
-    if (response && response.length > 0) {
-      recommendedRecipes.value = response
-      aiAnalysis.value = {
-        userProfile:
-          '基于您的体质特征和饮食偏好分析，您适合温和调理型菜谱，注重营养均衡和口感清淡。',
-        recommendStrategy:
-          '推荐以温补为主、营养均衡的菜谱，注重易消化和季节适应性，符合您的体质调理需求。',
-        nutritionBalance:
-          '推荐菜谱营养搭配均衡，蛋白质、维生素、膳食纤维含量适中，有助于增强体质和改善消化。'
+    if (response && response.data) {
+      // 提取推荐菜谱列表
+      const recipes = response.data.list || []
+
+      if (recipes.length > 0) {
+        recommendedRecipes.value = recipes
+
+        // 提取AI分析数据
+        if (response.data.aiAnalysis) {
+          aiAnalysis.value = response.data.aiAnalysis
+        } else {
+          // 如果API没有返回aiAnalysis，使用默认值
+          aiAnalysis.value = {
+            userProfile:
+              '基于您的体质特征和饮食偏好分析，您适合温和调理型菜谱，注重营养均衡和口感清淡。',
+            recommendStrategy:
+              '推荐以温补为主、营养均衡的菜谱，注重易消化和季节适应性，符合您的体质调理需求。',
+            nutritionBalance:
+              '推荐菜谱营养搭配均衡，蛋白质、维生素、膳食纤维含量适中，有助于增强体质和改善消化。'
+          }
+        }
+
+        // 更新统计
+        recommendStats.totalRecommended += recipes.length
+        updateMatchRate()
+
+        toast.success(`AI为您推荐了 ${recipes.length} 道菜谱`)
+      } else {
+        toast.warning('暂无符合条件的推荐，请调整推荐条件')
       }
-
-      // 更新统计
-      recommendStats.totalRecommended += response.length
-      updateMatchRate()
-
-      toast.success(`AI为您推荐了 ${response.length} 道菜谱`)
     } else {
-      toast.warning('暂无符合条件的推荐，请调整推荐条件')
+      toast.warning('推荐服务暂时不可用，请稍后重试')
     }
   } catch (error) {
     console.error('AI推荐失败:', error)

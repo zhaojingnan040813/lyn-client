@@ -164,16 +164,8 @@ export const useRecipeStore = defineStore('recipe', () => {
         ...params
       })
 
-      if (response.code === 0) {
-        const aiRecipes = response.data.list || []
-
-        // 将AI推荐结果合并到菜谱列表
-        recipes.value = [...aiRecipes, ...recipes.value]
-
-        return aiRecipes
-      } else {
-        throw new Error(response.message || 'AI推荐失败')
-      }
+      // 返回完整的API响应，让组件自己处理数据提取
+      return response
     } catch (err) {
       error.value = err.message
       console.error('AI推荐失败:', err)

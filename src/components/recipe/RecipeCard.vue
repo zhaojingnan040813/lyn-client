@@ -49,9 +49,18 @@
 
       <p class="recipe-description">{{ recipe.description }}</p>
 
+      <!-- AI推荐理由 -->
+      <div v-if="recipe.matchReason" class="ai-recommendation">
+        <div class="recommendation-header">
+          <span class="recommendation-icon">🎯</span>
+          <span class="recommendation-title">推荐理由</span>
+        </div>
+        <p class="recommendation-text">{{ recipe.matchReason }}</p>
+      </div>
+
       <!-- 营养标签 -->
-      <div v-if="recipe.nutritionTags && recipe.nutritionTags.length" class="nutrition-tags">
-        <span v-for="tag in recipe.nutritionTags.slice(0, 3)" :key="tag" class="nutrition-tag">
+      <div v-if="displayNutritionTags && displayNutritionTags.length" class="nutrition-tags">
+        <span v-for="tag in displayNutritionTags.slice(0, 3)" :key="tag" class="nutrition-tag">
           {{ getNutritionLabel(tag) }}
         </span>
       </div>
@@ -118,6 +127,16 @@ const toast = useToast()
 
 const imageError = ref(false)
 const isFavorited = ref(false)
+
+// 计算属性：显示营养标签（优先使用AI推荐的营养标签）
+const displayNutritionTags = computed(() => {
+  // 如果有AI推荐的营养标签，优先显示
+  if (props.recipe.aiRecommendation && props.recipe.aiRecommendation.nutritionTags) {
+    return props.recipe.aiRecommendation.nutritionTags
+  }
+  // 否则使用原有的营养标签
+  return props.recipe.nutritionTags || []
+})
 
 const getCategoryLabel = category => {
   const categoryMap = {
@@ -351,6 +370,43 @@ const handleShare = () => {
   line-height: var(--leading-relaxed);
   margin: 0 0 var(--spacing-md) 0;
   flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* AI推荐理由 */
+.ai-recommendation {
+  background: linear-gradient(135deg, var(--color-accent-alpha), var(--color-bg-secondary));
+  border: 1px solid var(--color-accent-alpha);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.recommendation-icon {
+  font-size: var(--text-sm);
+}
+
+.recommendation-title {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-accent);
+}
+
+.recommendation-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
