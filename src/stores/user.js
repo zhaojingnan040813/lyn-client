@@ -300,15 +300,16 @@ export const useUserStore = defineStore('user', () => {
         method
       )
       if (response.code === 0) {
-        constitution.value = response.data.constitution
-        constitutionInfo.value = response.data.constitutionInfo
+        // 直接设置体质类型，因为API可能不返回完整对象
+        constitution.value = {
+          type: constitutionType,
+          diagnosisMethod: method,
+          diagnosedAt: new Date().toISOString()
+        }
 
         // 保存到localStorage
         if (constitution.value) {
           localStorage.setItem('constitution', JSON.stringify(constitution.value))
-        }
-        if (constitutionInfo.value) {
-          localStorage.setItem('constitutionInfo', JSON.stringify(constitutionInfo.value))
         }
 
         return true

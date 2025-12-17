@@ -117,6 +117,14 @@ const routes = [
     meta: {
       title: '测试页面 - 智能体质膳食推荐系统'
     }
+  },
+  {
+    path: '/test-constitution',
+    name: 'TestConstitution',
+    component: () => import('../views/TestConstitution.vue'),
+    meta: {
+      title: '体质设置测试 - 智能体质膳食推荐系统'
+    }
   }
 ]
 
