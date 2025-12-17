@@ -42,7 +42,7 @@
           </span>
           <span v-if="recipe.difficulty" class="meta-item">
             <span class="meta-icon">📊</span>
-            {{ getDifficultyLabel(recipe.difficulty) }}
+            {{ recipe.difficulty }}
           </span>
         </div>
       </div>
@@ -127,15 +127,6 @@ const getCategoryLabel = category => {
     quick: '快手菜'
   }
   return categoryMap[category] || category
-}
-
-const getDifficultyLabel = difficulty => {
-  const difficultyMap = {
-    1: '简单',
-    2: '中等',
-    3: '困难'
-  }
-  return difficultyMap[difficulty] || '未知'
 }
 
 const getNutritionLabel = tag => {

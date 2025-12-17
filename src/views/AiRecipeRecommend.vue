@@ -46,11 +46,11 @@
               <div class="results-actions">
                 <button
                   class="action-btn save-all-btn"
-                  :disabled="selectedRecipes.size === 0"
+                  :disabled="recommendedRecipes.length === 0"
                   @click="handleSaveAll"
                 >
                   <span class="btn-icon">💾</span>
-                  保存选中 ({{ selectedRecipes.size }})
+                  保存AI生成结果
                 </button>
                 <button class="action-btn refresh-btn" @click="handleRefresh">
                   <span class="btn-icon">🔄</span>
@@ -67,15 +67,6 @@
                 class="recipe-card-wrapper"
                 :style="{ animationDelay: `${index * 0.1}s` }"
               >
-                <div class="recipe-checkbox" @click="toggleRecipeSelection(recipe._id)">
-                  <input
-                    type="checkbox"
-                    :checked="selectedRecipes.has(recipe._id)"
-                    @change="toggleRecipeSelection(recipe._id)"
-                  />
-                  <span class="checkbox-custom"></span>
-                </div>
-
                 <RecipeCard
                   :recipe="recipe"
                   :is-featured="recipe.matchScore >= 90"
@@ -83,18 +74,6 @@
                   @favorite-toggle="handleFavoriteToggle"
                   @share="handleRecipeShare"
                 />
-
-                <!-- <div class="recipe-actions">
-                  <button
-                    class="save-btn"
-                    :class="{ 'is-saved': recipe.saved }"
-                    @click="handleSaveRecipe(recipe)"
-                  >
-                    <span v-if="!recipe.saved">💾</span>
-                    <span v-else>✅</span>
-                    {{ recipe.saved ? '已保存' : '保存' }}
-                  </button>
-                </div> -->
               </div>
             </div>
           </div>
@@ -150,7 +129,6 @@ const userStore = useUserStore()
 const isRecommending = ref(false)
 const recommendedRecipes = ref([])
 const aiAnalysis = ref(null)
-const selectedRecipes = ref(new Set())
 const selectedRecipe = ref(null)
 const detailRecipe = ref(null)
 const isSaveModalVisible = ref(false)
@@ -217,29 +195,12 @@ const handleRecipeShare = recipe => {
   recipeStore.shareRecipe(recipe._id)
 }
 
-// 切换菜谱选择
-const toggleRecipeSelection = recipeId => {
-  if (selectedRecipes.value.has(recipeId)) {
-    selectedRecipes.value.delete(recipeId)
-  } else {
-    selectedRecipes.value.add(recipeId)
-  }
-}
-
-// 处理保存单个菜谱
-const handleSaveRecipe = recipe => {
-  selectedRecipe.value = recipe
-  isSaveModalVisible.value = true
-}
-
 // 处理批量保存
 const handleSaveAll = async () => {
-  const recipesToSave = recommendedRecipes.value.filter(
-    recipe => selectedRecipes.value.has(recipe._id) && !recipe.saved
-  )
+  const recipesToSave = recommendedRecipes.value.filter(recipe => !recipe.saved)
 
   if (recipesToSave.length === 0) {
-    toast.info('没有需要保存的菜谱')
+    toast.info('所有菜谱都已保存')
     return
   }
 
@@ -256,7 +217,6 @@ const handleSaveAll = async () => {
     }
 
     recommendStats.saved += recipesToSave.length
-    selectedRecipes.value.clear()
 
     toast.success(`成功保存 ${recipesToSave.length} 道菜谱`)
   } catch (error) {
@@ -290,7 +250,6 @@ const handleSaveConfirm = async saveData => {
 const handleRefresh = () => {
   recommendedRecipes.value = []
   aiAnalysis.value = null
-  selectedRecipes.value.clear()
 
   // 触发重新推荐（这里可以保存之前的参数）
   toast.info('请重新配置推荐条件')
@@ -610,42 +569,6 @@ const observeRecipeCards = () => {
 .recipe-card-wrapper {
   position: relative;
   animation: slideInUp 0.6s ease-out backwards;
-}
-
-.recipe-checkbox {
-  position: absolute;
-  top: var(--spacing-sm);
-  left: var(--spacing-sm);
-  z-index: 2;
-  cursor: pointer;
-}
-
-.recipe-checkbox input[type='checkbox'] {
-  display: none;
-}
-
-.checkbox-custom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: var(--color-bg-elevated);
-  border: 2px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-base);
-}
-
-.recipe-checkbox input:checked + .checkbox-custom {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.recipe-checkbox input:checked + .checkbox-custom::after {
-  content: '✓';
-  color: white;
-  font-size: var(--text-sm);
-  font-weight: var(--font-bold);
 }
 
 /* .recipe-actions {
