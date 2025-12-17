@@ -20,7 +20,7 @@
             <p class="info-date">诊断于 {{ formatDate(userStore.constitution.diagnosedAt) }}</p>
           </div>
           <div class="constitution-info" v-else>
-            <p class="text-secondary text-sm">尚未进行体质测评</p>
+            <p class="text-secondary text-sm">尚未进行体质设置</p>
             <router-link to="/constitution-diagnosis" class="btn btn-primary btn-sm">
               去测评
             </router-link>

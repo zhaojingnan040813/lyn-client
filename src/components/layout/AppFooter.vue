@@ -4,16 +4,14 @@
       <div class="footer-content">
         <div class="footer-section">
           <h3 class="footer-title">智膳</h3>
-          <p class="footer-desc">
-            基于中医体质理论的智能膳食推荐系统
-          </p>
+          <p class="footer-desc">基于中医体质理论的智能膳食推荐系统</p>
         </div>
 
         <div class="footer-section">
           <h4 class="footer-heading">快速链接</h4>
           <ul class="footer-links">
             <li><router-link to="/ai-diagnosis">AI 问诊</router-link></li>
-            <li><router-link to="/constitution-diagnosis">体质测评</router-link></li>
+            <li><router-link to="/constitution-diagnosis">体质设置</router-link></li>
             <li><router-link to="/recipe-recommendation">菜谱浏览</router-link></li>
           </ul>
         </div>
@@ -29,9 +27,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="copyright">
-          © {{ currentYear }} 智膳. All rights reserved.
-        </p>
+        <p class="copyright">© {{ currentYear }} 智膳. All rights reserved.</p>
       </div>
     </div>
   </footer>

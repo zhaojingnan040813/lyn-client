@@ -36,9 +36,7 @@
             <div class="feature-icon">{{ feature.icon }}</div>
             <h3 class="feature-title">{{ feature.title }}</h3>
             <p class="feature-description">{{ feature.description }}</p>
-            <router-link :to="feature.link" class="feature-link">
-              了解更多 →
-            </router-link>
+            <router-link :to="feature.link" class="feature-link">了解更多 →</router-link>
           </div>
         </div>
       </div>
@@ -70,7 +68,7 @@ const features = ref([
   },
   {
     icon: '🔍',
-    title: '体质测评',
+    title: '体质设置',
     description: '基于中医九种体质理论，科学评估您的体质类型，为膳食推荐提供依据',
     link: '/constitution-diagnosis'
   },
@@ -117,7 +115,7 @@ const stats = ref([
   content: '';
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 50%, var(--color-primary-alpha) 0%, transparent 50%),
     radial-gradient(circle at 80% 50%, var(--color-accent-alpha) 0%, transparent 50%);
   animation: float 8s ease-in-out infinite;
@@ -259,26 +257,27 @@ const stats = ref([
   .hero-title {
     font-size: var(--text-4xl);
   }
-  
+
   .hero-subtitle {
     font-size: var(--text-2xl);
   }
-  
+
   .hero-actions {
     flex-direction: column;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
   }
   50% {

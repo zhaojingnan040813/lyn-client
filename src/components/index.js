@@ -11,11 +11,8 @@ export { default as AppFooter } from './layout/AppFooter.vue'
 export { default as LoadingSpinner } from './common/LoadingSpinner.vue'
 export { default as Toast } from './common/Toast.vue'
 
-// 体质测评组件
+// 体质设置组件
 export { default as QuestionOption } from './constitution/QuestionOption.vue'
-export { default as QuestionCard } from './constitution/QuestionCard.vue'
-export { default as RadarChart } from './constitution/RadarChart.vue'
-export { default as AdviceCard } from './constitution/AdviceCard.vue'
 
 // 菜谱相关组件
 export { default as RecipeCard } from './recipe/RecipeCard.vue'
