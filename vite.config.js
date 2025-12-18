@@ -16,7 +16,8 @@ export default defineConfig({
         proxy: {
             '/api': {
                 target: 'http://localhost:3000',
-                changeOrigin: true
+                changeOrigin: true,
+                timeout: 300000 // 5分钟超时，确保AI接口有足够时间响应
             }
         }
     }

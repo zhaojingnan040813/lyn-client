@@ -3,7 +3,7 @@ import axios from 'axios'
 // 创建通用axios实例
 const request = axios.create({
   baseURL: '/api',
-  timeout: 60000, // 60秒超时，适用于普通接口
+  timeout: 600000, //
   headers: {
     'Content-Type': 'application/json'
   }

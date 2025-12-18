@@ -238,13 +238,25 @@ const handleGenerate = async () => {
   }
 
   loading.value = true
+  const startTime = Date.now()
+
   try {
+    console.log('🤖 开始AI生成菜谱请求...', {
+      dishDescription: generateForm.value.dishDescription.trim(),
+      targetConstitution: generateForm.value.targetConstitution,
+      count: generateForm.value.count
+    })
+
     const response = await recipeApi.generateRecipeByAI({
       dishDescription: generateForm.value.dishDescription.trim(),
       targetConstitution: generateForm.value.targetConstitution,
       specialRequirements: generateForm.value.specialRequirements.trim(),
       count: generateForm.value.count
     })
+
+    const endTime = Date.now()
+    const duration = ((endTime - startTime) / 1000).toFixed(2)
+    console.log(`✅ AI生成菜谱成功，耗时: ${duration}秒`)
 
     if (response.code === 0) {
       // 处理响应数据
@@ -256,13 +268,28 @@ const handleGenerate = async () => {
 
       selectedRecipes.value = []
       hasGenerated.value = true
-      toast.success(`成功生成 ${generatedRecipes.value.length} 个菜谱`)
+      toast.success(`成功生成 ${generatedRecipes.value.length} 个菜谱（耗时${duration}秒）`)
     } else {
       throw new Error(response.message || '生成失败')
     }
   } catch (error) {
-    console.error('AI生成菜谱失败:', error)
-    toast.error('生成失败: ' + error.message)
+    const endTime = Date.now()
+    const duration = ((endTime - startTime) / 1000).toFixed(2)
+    console.error(`❌ AI生成菜谱失败，已耗时: ${duration}秒`, error)
+
+    // 区分不同类型的错误
+    let errorMessage = '生成失败'
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      errorMessage = '请求超时，AI生成需要较长时间，请稍后重试'
+    } else if (error.message === 'Network Error') {
+      errorMessage = '网络连接错误，请检查网络连接'
+    } else if (error.response) {
+      errorMessage = `服务器错误: ${error.response.status} - ${error.response.data?.message || error.message}`
+    } else {
+      errorMessage = error.message || '生成失败'
+    }
+
+    toast.error(errorMessage)
   } finally {
     loading.value = false
   }
