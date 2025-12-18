@@ -1,329 +1,242 @@
 <template>
-  <Teleport to="body">
-    <transition name="modal">
-      <div v-if="isVisible" class="modal-overlay" @click="handleOverlayClick">
-        <div class="modal-container" @click.stop>
-          <!-- 关闭按钮 -->
-          <button class="modal-close" @click="close">
+  <teleport to="body">
+    <div v-if="isVisible" class="modal-overlay" @click="handleOverlayClick">
+      <div class="modal-container" @click.stop>
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h2 class="modal-title">菜谱详情</h2>
+          <button class="close-btn" @click="close">
             <span class="close-icon">✕</span>
           </button>
+        </div>
 
-          <!-- 模态框内容 -->
-          <div class="modal-content">
-            <div v-if="loading" class="modal-loading">
-              <LoadingSpinner size="lg" />
-              <span>加载菜谱详情...</span>
-            </div>
-
-            <div v-else-if="recipe" class="recipe-detail">
-              <!-- 头部信息 -->
-              <div class="recipe-header">
-                <div class="recipe-image">
-                  <img
-                    v-if="recipe.image && !imageError"
-                    :src="recipe.image"
-                    :alt="recipe.name"
-                    @error="imageError = true"
-                  />
-                  <div v-else class="image-placeholder">
-                    <div class="placeholder-icon">
-                      <span>🍽️</span>
-                    </div>
-                  </div>
-
-                  <!-- 匹配度标签 -->
-                  <div v-if="recipe.matchScore !== undefined" class="match-badge">
-                    <span class="match-value">{{ recipe.matchScore }}%</span>
-                    <span class="match-label">匹配度</span>
-                  </div>
-                </div>
-
-                <div class="recipe-info">
-                  <h1 class="recipe-name">{{ recipe.name }}</h1>
-                  <p class="recipe-description">{{ recipe.description }}</p>
-
-                  <!-- 基础信息 -->
-                  <div class="recipe-meta">
-                    <div class="meta-group">
-                      <h3 class="meta-title">基本信息</h3>
-                      <div class="meta-list">
-                        <div v-if="recipe.cookingTime" class="meta-item">
-                          <span class="meta-icon">⏱️</span>
-                          <span class="meta-label">烹饪时间</span>
-                          <span class="meta-value">{{ recipe.cookingTime }}分钟</span>
-                        </div>
-                        <div v-if="recipe.difficulty" class="meta-item">
-                          <span class="meta-icon">📊</span>
-                          <span class="meta-label">难度等级</span>
-                          <span class="meta-value">
-                            {{ recipe.difficulty }}
-                          </span>
-                        </div>
-                        <div v-if="recipe.servings" class="meta-item">
-                          <span class="meta-icon">👥</span>
-                          <span class="meta-label">份量</span>
-                          <span class="meta-value">{{ recipe.servings }}人份</span>
-                        </div>
-                        <div v-if="recipe.category" class="meta-item">
-                          <span class="meta-icon">🏷️</span>
-                          <span class="meta-label">分类</span>
-                          <span class="meta-value">{{ getCategoryLabel(recipe.category) }}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- 体质适配 -->
-                    <div
-                      v-if="recipe.suitableConstitutions && recipe.suitableConstitutions.length"
-                      class="meta-group"
-                    >
-                      <h3 class="meta-title">适合体质</h3>
-                      <div class="constitutions-list">
-                        <span
-                          v-for="constitution in recipe.suitableConstitutions"
-                          :key="constitution"
-                          class="constitution-tag"
-                          :style="{ backgroundColor: getConstitutionColor(constitution) }"
-                        >
-                          {{ getConstitutionLabel(constitution) }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- 营养标签 -->
-                    <div
-                      v-if="recipe.nutritionTags && recipe.nutritionTags.length"
-                      class="meta-group"
-                    >
-                      <h3 class="meta-title">营养特点</h3>
-                      <div class="nutrition-tags-list">
-                        <span v-for="tag in recipe.nutritionTags" :key="tag" class="nutrition-tag">
-                          {{ getNutritionLabel(tag) }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 详细内容标签页 -->
-              <div class="recipe-tabs">
-                <div class="tabs-header">
-                  <button
-                    v-for="tab in tabs"
-                    :key="tab.key"
-                    :class="['tab-btn', { 'is-active': activeTab === tab.key }]"
-                    @click="activeTab = tab.key"
-                  >
-                    <span class="tab-icon">{{ tab.icon }}</span>
-                    <span class="tab-label">{{ tab.label }}</span>
-                  </button>
-                </div>
-
-                <div class="tabs-content">
-                  <!-- 食材清单 -->
-                  <div v-if="activeTab === 'ingredients'" class="tab-panel">
-                    <div
-                      v-if="recipe.ingredients && recipe.ingredients.length"
-                      class="ingredients-section"
-                    >
-                      <h3 class="section-title">食材清单</h3>
-                      <div class="ingredients-list">
-                        <div
-                          v-for="(ingredient, index) in recipe.ingredients"
-                          :key="index"
-                          class="ingredient-item"
-                        >
-                          <span class="ingredient-name">{{ ingredient.name || ingredient }}</span>
-                          <span v-if="ingredient.amount" class="ingredient-amount">
-                            {{ ingredient.amount }}
-                          </span>
-                          <span v-if="ingredient.unit" class="ingredient-unit">
-                            {{ ingredient.unit }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div v-else class="empty-section">
-                      <p>暂无食材信息</p>
-                    </div>
-                  </div>
-
-                  <!-- 烹饪步骤 -->
-                  <div v-if="activeTab === 'steps'" class="tab-panel">
-                    <div v-if="recipe.steps && recipe.steps.length" class="steps-section">
-                      <h3 class="section-title">烹饪步骤</h3>
-                      <div class="steps-list">
-                        <div v-for="(step, index) in recipe.steps" :key="index" class="step-item">
-                          <div class="step-number">{{ index + 1 }}</div>
-                          <div class="step-content">
-                            <p class="step-description">{{ step.content || step }}</p>
-                            <div v-if="step.time" class="step-time">
-                              <span class="time-icon">⏱️</span>
-                              {{ step.time }}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div v-else class="empty-section">
-                      <p>暂无烹饪步骤</p>
-                    </div>
-                  </div>
-
-                  <!-- 营养信息 -->
-                  <div v-if="activeTab === 'nutrition'" class="tab-panel">
-                    <div
-                      v-if="recipe.nutritionTags && recipe.nutritionTags.length"
-                      class="nutrition-section"
-                    >
-                      <h3 class="section-title">营养特点</h3>
-                      <div class="nutrition-tags-list">
-                        <span v-for="tag in recipe.nutritionTags" :key="tag" class="nutrition-tag">
-                          {{ tag }}
-                        </span>
-                      </div>
-                    </div>
-                    <div v-else class="empty-section">
-                      <p>暂无营养信息</p>
-                    </div>
-                  </div>
-
-                  <!-- AI推荐理由 -->
-                  <div v-if="activeTab === 'ai'" class="tab-panel">
-                    <div
-                      v-if="recipe.recommendReason || recipe.healthBenefits || recipe.bestMealTime"
-                      class="ai-section"
-                    >
-                      <h3 class="section-title">
-                        <span class="ai-icon">🤖</span>
-                        AI智能推荐分析
-                      </h3>
-                      <div v-if="recipe.recommendReason" class="ai-reason">
-                        <h4 class="reason-title">推荐理由</h4>
-                        <p class="reason-content">{{ recipe.recommendReason }}</p>
-                      </div>
-                      <div v-if="recipe.healthBenefits" class="ai-benefits">
-                        <h4 class="benefits-title">健康益处</h4>
-                        <p class="benefits-content">{{ recipe.healthBenefits }}</p>
-                      </div>
-                      <div
-                        v-if="recipe.nutritionTags && recipe.nutritionTags.length"
-                        class="ai-tags"
-                      >
-                        <h4 class="tags-title">营养标签</h4>
-                        <div class="ai-tags-list">
-                          <span v-for="tag in recipe.nutritionTags" :key="tag" class="ai-tag">
-                            {{ tag }}
-                          </span>
-                        </div>
-                      </div>
-                      <div v-if="recipe.bestMealTime" class="ai-meal-time">
-                        <h4 class="meal-time-title">最佳用餐时间</h4>
-                        <p class="meal-time-content">{{ recipe.bestMealTime }}</p>
-                      </div>
-                      <div v-if="recipe.seasonalAdvice" class="ai-seasonal">
-                        <h4 class="seasonal-title">季节建议</h4>
-                        <p class="seasonal-content">{{ recipe.seasonalAdvice }}</p>
-                      </div>
-                    </div>
-                    <div v-else class="empty-section">
-                      <p>暂无AI分析信息</p>
-                    </div>
-                  </div>
-                </div>
+        <!-- 模态框内容 -->
+        <div class="modal-content">
+          <!-- 基本信息 -->
+          <div class="recipe-basic-info">
+            <div class="recipe-header">
+              <div class="recipe-emoji">{{ recipe.emoji || '🍽️' }}</div>
+              <div class="recipe-title-section">
+                <h3 class="recipe-name">{{ recipe.name }}</h3>
+                <p class="recipe-category">{{ getCategoryLabel(recipe.category) }}</p>
               </div>
             </div>
 
-            <div v-else class="modal-error">
-              <div class="error-icon">⚠️</div>
-              <h3>加载失败</h3>
-              <p>无法获取菜谱详情，请稍后重试</p>
-              <button class="btn btn-primary" @click="retry">重试</button>
+            <div class="recipe-description">
+              <h4 class="section-title">菜品描述</h4>
+              <p class="description-text">{{ recipe.description }}</p>
+            </div>
+
+            <!-- AI生成信息 -->
+            <div v-if="recipe.generatedBy === 'AI'" class="ai-info">
+              <div class="ai-badge">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text">AI生成菜谱</span>
+              </div>
+              <div class="generation-params">
+                <h5 class="params-title">生成参数</h5>
+                <div class="param-list">
+                  <div class="param-item">
+                    <span class="param-label">菜品描述:</span>
+                    <span class="param-value">{{ recipe.inputParams?.dishDescription }}</span>
+                  </div>
+                  <div class="param-item">
+                    <span class="param-label">目标体质:</span>
+                    <span class="param-value">
+                      {{ getConstitutionLabel(recipe.inputParams?.targetConstitution) }}
+                    </span>
+                  </div>
+                  <div class="param-item">
+                    <span class="param-label">特殊要求:</span>
+                    <span class="param-value">
+                      {{ recipe.inputParams?.specialRequirements || '无' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- 操作按钮 -->
-          <div v-if="recipe && !loading" class="modal-actions">
-            <button class="action-btn favorite-btn" @click="toggleFavorite">
-              <span class="action-icon">{{ isFavorited ? '❤️' : '🤍' }}</span>
-              <span class="action-label">{{ isFavorited ? '已收藏' : '收藏' }}</span>
-            </button>
-            <button class="action-btn share-btn" @click="share">
-              <span class="action-icon">📤</span>
-              <span class="action-label">分享</span>
-            </button>
-            <button class="action-btn print-btn" @click="print">
-              <span class="action-icon">🖨️</span>
-              <span class="action-label">打印</span>
-            </button>
+          <!-- 中医属性 -->
+          <div class="tcm-properties">
+            <h4 class="section-title">中医属性</h4>
+            <div class="properties-grid">
+              <div class="property-item">
+                <span class="property-label">性质</span>
+                <span class="property-value">{{ recipe.nature }}</span>
+              </div>
+              <div class="property-item">
+                <span class="property-label">五味</span>
+                <span class="property-value">{{ recipe.flavors?.join('、') || '-' }}</span>
+              </div>
+              <div class="property-item">
+                <span class="property-label">归经</span>
+                <span class="property-value">{{ recipe.meridians?.join('、') || '-' }}</span>
+              </div>
+              <div class="property-item">
+                <span class="property-label">基础评分</span>
+                <span class="property-value">{{ recipe.baseScore }}分</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 体质适配 -->
+          <div class="constitution-info">
+            <h4 class="section-title">体质适配</h4>
+            <div class="constitution-sections">
+              <div class="constitution-group">
+                <h5 class="group-title">适宜体质</h5>
+                <div class="constitution-tags">
+                  <span
+                    v-for="constitution in recipe.suitableConstitutions"
+                    :key="constitution"
+                    class="constitution-tag suitable"
+                    :style="{ '--constitution-color': getConstitutionColor(constitution) }"
+                  >
+                    {{ getConstitutionLabel(constitution) }}
+                  </span>
+                </div>
+              </div>
+              <div class="constitution-group">
+                <h5 class="group-title">禁忌体质</h5>
+                <div class="constitution-tags">
+                  <span
+                    v-for="constitution in recipe.avoidConstitutions"
+                    :key="constitution"
+                    class="constitution-tag avoid"
+                    :style="{ '--constitution-color': getConstitutionColor(constitution) }"
+                  >
+                    {{ getConstitutionLabel(constitution) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 制作信息 -->
+          <div class="cooking-info">
+            <h4 class="section-title">制作信息</h4>
+            <div class="cooking-grid">
+              <div class="cooking-item">
+                <span class="cooking-label">烹饪时间</span>
+                <span class="cooking-value">{{ recipe.cookingTime }}分钟</span>
+              </div>
+              <div class="cooking-item">
+                <span class="cooking-label">难度等级</span>
+                <span class="cooking-value">{{ recipe.difficulty }}</span>
+              </div>
+              <div class="cooking-item">
+                <span class="cooking-label">基础评分</span>
+                <span class="cooking-value">{{ recipe.baseScore }}分</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 食材清单 -->
+          <div class="ingredients-section">
+            <h4 class="section-title">食材清单</h4>
+            <div class="ingredients-grid">
+              <div
+                v-for="(ingredient, index) in recipe.ingredients"
+                :key="index"
+                class="ingredient-item"
+              >
+                <span class="ingredient-icon">{{ ingredient.icon || '🥘' }}</span>
+                <div class="ingredient-info">
+                  <span class="ingredient-name">{{ ingredient.name }}</span>
+                  <span class="ingredient-amount">{{ ingredient.amount }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 制作步骤 -->
+          <div class="steps-section">
+            <h4 class="section-title">制作步骤</h4>
+            <div class="steps-list">
+              <div v-for="(step, index) in recipe.steps" :key="index" class="step-item">
+                <div class="step-header">
+                  <span class="step-number">步骤 {{ step.order }}</span>
+                </div>
+                <div class="step-content">
+                  <p class="step-text">{{ step.content }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 标签 -->
+          <div class="tags-section">
+            <h4 class="section-title">标签</h4>
+            <div class="tags-list">
+              <span v-for="tag in recipe.tags" :key="tag" class="tag">
+                {{ tag }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 中医分析 -->
+          <div v-if="recipe.analysis" class="analysis-section">
+            <h4 class="section-title">中医分析</h4>
+            <div class="analysis-content">
+              <p class="analysis-text">{{ recipe.analysis }}</p>
+            </div>
           </div>
         </div>
+
+        <!-- 模态框底部 -->
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="close">关闭</button>
+        </div>
       </div>
-    </transition>
-  </Teleport>
+    </div>
+  </teleport>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useToast } from '@/utils/toast'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { computed } from 'vue'
 
 const props = defineProps({
-  isVisible: {
-    type: Boolean,
-    default: false
-  },
   recipe: {
     type: Object,
-    default: null
+    required: true
   },
-  loading: {
+  isVisible: {
     type: Boolean,
     default: false
   }
 })
 
-const emit = defineEmits(['close', 'favorite-toggle', 'share', 'retry'])
+const emit = defineEmits(['close'])
 
-const toast = useToast()
+// 体质映射
+const constitutionMap = {
+  balanced: '平和质',
+  qi_deficiency: '气虚质',
+  yang_deficiency: '阳虚质',
+  yin_deficiency: '阴虚质',
+  phlegm_dampness: '痰湿质',
+  damp_heat: '湿热质',
+  blood_stasis: '血瘀质',
+  qi_stagnation: '气郁质',
+  special: '特禀质'
+}
 
-// 本地状态
-const imageError = ref(false)
-const isFavorited = ref(false)
-const activeTab = ref('ingredients')
+// 分类映射
+const categoryMap = {
+  recommended: '推荐',
+  warming: '温补',
+  cooling: '清热',
+  quick: '快手菜',
+  neutral: '中性'
+}
 
-// 标签页配置
-const tabs = [
-  { key: 'ingredients', label: '食材', icon: '🥘' },
-  { key: 'steps', label: '步骤', icon: '📝' },
-  { key: 'nutrition', label: '营养', icon: '📊' },
-  { key: 'ai', label: 'AI分析', icon: '🤖' }
-]
-
-// 获取标签映射函数
+// 方法
 const getCategoryLabel = category => {
-  const categoryMap = {
-    recommended: '推荐',
-    warming: '温补',
-    cooling: '清热',
-    quick: '快手菜'
-  }
   return categoryMap[category] || category
 }
 
 const getConstitutionLabel = constitution => {
-  const constitutionMap = {
-    balanced: '平和质',
-    qi_deficiency: '气虚质',
-    yang_deficiency: '阳虚质',
-    yin_deficiency: '阴虚质',
-    phlegm_dampness: '痰湿质',
-    damp_heat: '湿热质',
-    blood_stasis: '血瘀质',
-    qi_stagnation: '气郁质',
-    special: '特禀质'
-  }
   return constitutionMap[constitution] || constitution
 }
 
@@ -342,21 +255,6 @@ const getConstitutionColor = constitution => {
   return colorMap[constitution] || 'var(--color-text-tertiary)'
 }
 
-const getNutritionLabel = key => {
-  const nutritionMap = {
-    calories: '热量',
-    protein: '蛋白质',
-    fat: '脂肪',
-    carbohydrate: '碳水化合物',
-    fiber: '膳食纤维',
-    sodium: '钠',
-    sugar: '糖分',
-    cholesterol: '胆固醇'
-  }
-  return nutritionMap[key] || key
-}
-
-// 操作处理
 const close = () => {
   emit('close')
 }
@@ -364,725 +262,594 @@ const close = () => {
 const handleOverlayClick = () => {
   close()
 }
-
-const toggleFavorite = () => {
-  isFavorited.value = !isFavorited.value
-  emit('favorite-toggle', props.recipe, isFavorited.value)
-
-  toast.info(isFavorited.value ? '已添加到收藏' : '已取消收藏')
-}
-
-const share = () => {
-  const shareUrl = `${window.location.origin}/recipe/${props.recipe.id}`
-  navigator.clipboard
-    .writeText(shareUrl)
-    .then(() => {
-      toast.success('链接已复制到剪贴板')
-    })
-    .catch(() => {
-      toast.error('复制失败，请手动复制链接')
-    })
-  emit('share', props.recipe)
-}
-
-const print = () => {
-  window.print()
-}
-
-const retry = () => {
-  emit('retry')
-}
-
-// 监听菜谱变化，重置状态
-watch(
-  () => props.recipe,
-  newRecipe => {
-    if (newRecipe) {
-      imageError.value = false
-      activeTab.value = 'ingredients'
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <style scoped>
-/* 模态框基础样式 */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(var(--blur-sm));
-  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: var(--z-modal);
   padding: var(--spacing-lg);
 }
 
 .modal-container {
   background: var(--color-bg-elevated);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-2xl);
   max-width: 900px;
-  max-height: 90vh;
   width: 100%;
-  position: relative;
-  overflow: hidden;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--color-border-light);
 }
 
-.modal-close {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  width: 40px;
-  height: 40px;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-full);
-  cursor: pointer;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.modal-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  font-family: var(--font-serif);
+}
+
+.close-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  width: 40px;
+  height: 40px;
+  background: var(--color-bg-tertiary);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
   transition: all var(--transition-base);
 }
 
-.modal-close:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-  transform: scale(1.1);
+.close-btn:hover {
+  background: var(--color-error);
+  color: var(--color-text-inverse);
 }
 
 .close-icon {
   font-size: var(--text-lg);
-  font-weight: var(--font-bold);
 }
 
 .modal-content {
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-xl);
-  padding-top: var(--spacing-2xl);
-}
-
-/* 加载和错误状态 */
-.modal-loading,
-.modal-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  min-height: 200px;
-  color: var(--color-text-secondary);
-}
-
-.error-icon {
-  font-size: 3rem;
-  color: var(--color-error);
-}
-
-/* 菜谱详情 */
-.recipe-detail {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
 }
 
-/* 头部信息 */
+/* 基本信息 */
+.recipe-basic-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
 .recipe-header {
   display: flex;
-  gap: var(--spacing-xl);
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-.recipe-image {
-  position: relative;
-  width: 300px;
-  height: 225px;
+.recipe-emoji {
+  font-size: 4rem;
+  line-height: 1;
   flex-shrink: 0;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-tertiary);
 }
 
-.recipe-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--color-bg-tertiary), var(--color-bg-secondary));
-}
-
-.placeholder-icon {
-  font-size: 3rem;
-  opacity: 0.5;
-}
-
-.placeholder-icon span {
-  display: inline-block;
-}
-
-.match-badge {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: var(--gradient-accent);
-  color: white;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-}
-
-.match-value {
-  display: block;
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-}
-
-.match-label {
-  font-size: var(--text-xs);
-  opacity: 0.9;
-}
-
-.recipe-info {
+.recipe-title-section {
   flex: 1;
   min-width: 0;
 }
 
 .recipe-name {
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   font-weight: var(--font-bold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-md) 0;
+  margin: 0 0 var(--spacing-sm) 0;
   line-height: var(--leading-tight);
+  font-family: var(--font-serif);
+}
+
+.recipe-category {
+  font-size: var(--text-lg);
+  color: var(--color-accent);
+  font-weight: var(--font-medium);
+  margin: 0;
 }
 
 .recipe-description {
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-relaxed);
-  margin: 0 0 var(--spacing-lg) 0;
-}
-
-/* 元信息 */
-.recipe-meta {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.meta-group {
+  padding: var(--spacing-lg);
   background: var(--color-bg-secondary);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
   border: 1px solid var(--color-border-light);
-}
-
-.meta-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-md) 0;
-}
-
-.meta-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  background: var(--color-bg-elevated);
-  border-radius: var(--radius-md);
-}
-
-.meta-icon {
-  font-size: var(--text-lg);
-  flex-shrink: 0;
-}
-
-.meta-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  min-width: 80px;
-}
-
-.meta-value {
-  font-size: var(--text-sm);
-  color: var(--color-text-primary);
-  font-weight: var(--font-medium);
-}
-
-/* 体质标签 */
-.constitutions-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-}
-
-.constitution-tag {
-  color: white;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-}
-
-/* 营养标签 */
-.nutrition-tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.nutrition-tag {
-  background: var(--color-accent);
-  color: white;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-}
-
-/* 标签页 */
-.recipe-tabs {
-  background: var(--color-bg-elevated);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  overflow: hidden;
-}
-
-.tabs-header {
-  display: flex;
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.tab-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-md);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  border-bottom: 2px solid transparent;
-}
-
-.tab-btn:hover {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
-}
-
-.tab-btn.is-active {
-  background: var(--color-bg-elevated);
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.tab-icon {
-  font-size: var(--text-base);
-}
-
-.tabs-content {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.tab-panel {
-  padding: var(--spacing-lg);
 }
 
 .section-title {
   font-size: var(--text-lg);
   font-weight: var(--font-semibold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-lg) 0;
-}
-
-/* 食材清单 */
-.ingredients-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.ingredient-item {
+  margin: 0 0 var(--spacing-md) 0;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-base);
 }
 
-.ingredient-item:hover {
-  background: var(--color-bg-tertiary);
-  transform: translateX(4px);
-}
-
-.ingredient-name {
-  flex: 1;
+.description-text {
   font-size: var(--text-base);
-  color: var(--color-text-primary);
-  font-weight: var(--font-medium);
-}
-
-.ingredient-amount {
-  color: var(--color-accent);
-  font-weight: var(--font-semibold);
-  font-size: var(--text-sm);
-}
-
-.ingredient-unit {
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-}
-
-/* 烹饪步骤 */
-.steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.step-item {
-  display: flex;
-  gap: var(--spacing-lg);
-}
-
-.step-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: var(--radius-full);
-  font-weight: var(--font-bold);
-  font-size: var(--text-lg);
-  flex-shrink: 0;
-}
-
-.step-content {
-  flex: 1;
-  padding-top: var(--spacing-xs);
-}
-
-.step-description {
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  line-height: var(--leading-relaxed);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.step-time {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-}
-
-.time-icon {
-  font-size: var(--text-base);
-}
-
-/* 营养信息 */
-.nutrition-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-md);
-}
-
-.nutrition-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-light);
-}
-
-.nutrition-label {
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-}
-
-.nutrition-value {
-  color: var(--color-text-primary);
-  font-weight: var(--font-semibold);
-  font-size: var(--text-base);
-}
-
-/* AI分析 */
-.ai-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.ai-icon {
-  font-size: var(--text-xl);
-  margin-right: var(--spacing-sm);
-}
-
-.ai-reason,
-.ai-benefits,
-.ai-tags,
-.ai-meal-time,
-.ai-seasonal {
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--color-border-light);
-}
-
-.reason-title,
-.benefits-title,
-.tags-title,
-.meal-time-title,
-.seasonal-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.reason-content,
-.benefits-content,
-.meal-time-content,
-.seasonal-content {
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
   margin: 0;
 }
 
-.ai-tags-list {
+/* AI生成信息 */
+.ai-info {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--gradient-accent);
+  background-opacity: 0.1;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-accent);
+}
+
+.ai-badge {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.ai-icon {
+  font-size: var(--text-xl);
+}
+
+.ai-text {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-accent);
+}
+
+.generation-params {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.params-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.param-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.param-item {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.param-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-medium);
+  min-width: 80px;
+}
+
+.param-value {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+/* 中医属性 */
+.tcm-properties {
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.property-item {
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-xs);
 }
 
-.ai-tag {
-  background: var(--gradient-accent);
-  color: white;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
+.property-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
   font-weight: var(--font-medium);
 }
 
-/* 空状态 */
-.empty-section {
-  text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--color-text-tertiary);
+.property-value {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
 }
 
-/* 操作按钮 */
-.modal-actions {
+/* 体质适配 */
+.constitution-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.constitution-sections {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.constitution-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.group-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.constitution-tags {
   display: flex;
   gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
-  background: var(--color-bg-secondary);
-  border-top: 1px solid var(--color-border-light);
+  flex-wrap: wrap;
 }
 
-.action-btn {
-  flex: 1;
+.constitution-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--constitution-color, var(--color-text-primary));
+  background: var(--constitution-color, var(--color-bg-tertiary));
+  background-opacity: 0.1;
+  border: 1px solid var(--constitution-color, var(--color-border-light));
+}
+
+.constitution-tag.suitable {
+  background: var(--constitution-color, var(--color-bg-tertiary));
+  background-opacity: 0.15;
+}
+
+.constitution-tag.avoid {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-tertiary);
+  border-color: var(--color-border-medium);
+  opacity: 0.7;
+}
+
+/* 制作信息 */
+.cooking-info {
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+}
+
+.cooking-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.cooking-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  text-align: center;
+}
+
+.cooking-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-medium);
+}
+
+.cooking-value {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
+}
+
+/* 食材清单 */
+.ingredients-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.ingredient-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-medium);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-base);
+}
+
+.ingredient-icon {
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+}
+
+.ingredient-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ingredient-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.ingredient-amount {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }
 
-.action-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+/* 制作步骤 */
+.steps-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
-.action-icon {
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+}
+
+.step-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-bold);
+}
+
+.step-number {
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.step-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.step-text {
   font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
 }
 
-.action-label {
+/* 标签 */
+.tags-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.tags-list {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
   font-weight: var(--font-medium);
+  border: 1px solid var(--color-border-light);
 }
 
-/* 过渡动画 */
-.modal-enter-active,
-.modal-leave-active {
-  transition: all var(--transition-slow);
+/* 中医分析 */
+.analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
+.analysis-content {
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
 }
 
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.9) translateY(20px);
+.analysis-text {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
 }
 
-.modal-enter-active .modal-container,
-.modal-leave-active .modal-container {
-  transform: scale(1) translateY(0);
+/* 模态框底部 */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: var(--font-sans);
+}
+
+.btn-secondary {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-accent);
 }
 
 /* 响应式设计 */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: var(--spacing-md);
+  }
+
+  .modal-container {
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-content,
+  .modal-footer {
+    padding: var(--spacing-lg);
+  }
+
   .recipe-header {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
-  .recipe-image {
-    width: 100%;
-    max-width: 400px;
-    height: 300px;
+  .recipe-emoji {
+    font-size: 3rem;
   }
 
-  .modal-container {
-    max-width: 95%;
-    max-height: 95vh;
-  }
-}
-
-@media (max-width: 768px) {
-  .modal-overlay {
-    padding: var(--spacing-sm);
-  }
-
-  .modal-content {
-    padding: var(--spacing-lg);
-    padding-top: var(--spacing-xl);
-  }
-
-  .recipe-name {
-    font-size: var(--text-2xl);
-  }
-
-  .tabs-header {
-    flex-wrap: wrap;
-  }
-
-  .tab-btn {
-    flex: 1;
-    min-width: 80px;
-  }
-
-  .tab-icon {
-    display: none;
-  }
-
-  .nutrition-grid {
+  .properties-grid {
     grid-template-columns: 1fr;
   }
 
-  .modal-actions {
+  .constitution-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .cooking-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cooking-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .ingredients-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .step-item {
     flex-direction: column;
+  }
+
+  .step-header {
+    width: 60px;
+    height: 60px;
   }
 }
 
 @media (max-width: 480px) {
-  .recipe-image {
-    height: 200px;
+  .modal-header,
+  .modal-content,
+  .modal-footer {
+    padding: var(--spacing-md);
   }
 
-  .meta-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-xs);
+  .recipe-emoji {
+    font-size: 2.5rem;
   }
 
-  .meta-label {
-    min-width: auto;
-  }
-
-  .step-item {
-    gap: var(--spacing-md);
+  .step-header {
+    width: 50px;
+    height: 50px;
   }
 
   .step-number {
-    width: 32px;
-    height: 32px;
-    font-size: var(--text-base);
-  }
-}
-
-/* 打印样式 */
-@media print {
-  .modal-overlay {
-    position: static;
-    background: white;
-    backdrop-filter: none;
+    font-size: var(--text-xs);
   }
 
-  .modal-container {
-    box-shadow: none;
-    max-width: 100%;
-    max-height: none;
+  .modal-footer {
+    flex-direction: column;
   }
 
-  .modal-close,
-  .modal-actions {
-    display: none;
-  }
-
-  .tabs-content {
-    max-height: none;
-    overflow: visible;
-  }
-
-  .tab-btn {
-    display: none;
-  }
-
-  .tab-panel {
-    display: block !important;
-    page-break-inside: avoid;
+  .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

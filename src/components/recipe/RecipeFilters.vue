@@ -28,9 +28,6 @@
         >
           <span class="category-icon">{{ category.icon }}</span>
           <span class="category-label">{{ category.label }}</span>
-          <span v-if="category.count !== undefined" class="category-count">
-            ({{ category.count }})
-          </span>
         </button>
       </div>
     </div>
@@ -147,7 +144,7 @@ const toast = useToast()
 
 // 搜索相关
 const searchKeyword = ref('')
-const selectedCategory = ref('recommended')
+const selectedCategory = ref('warming')
 
 // 高级筛选展开状态
 const showAdvanced = ref(false)
@@ -162,9 +159,9 @@ const filters = ref({
 
 // 分类数据
 const categories = ref([
-  { key: 'recommended', label: '推荐', icon: '⭐', count: 0 },
   { key: 'warming', label: '温补', icon: '🔥', count: 0 },
-  { key: 'cooling', label: '清热', icon: '❄️', count: 0 },
+  { key: 'cooling', label: '清润', icon: '❄️', count: 0 },
+  { key: 'neutral', label: '平和', icon: '🌿', count: 0 },
   { key: 'quick', label: '快手菜', icon: '⚡', count: 0 }
 ])
 
@@ -261,7 +258,7 @@ const applyFilters = () => {
 // 重置筛选
 const resetFilters = () => {
   searchKeyword.value = ''
-  selectedCategory.value = 'recommended'
+  selectedCategory.value = 'warming'
   filters.value = {
     maxTime: '',
     difficulty: '',
@@ -422,11 +419,6 @@ defineExpose({
 
 .category-label {
   font-size: var(--text-sm);
-}
-
-.category-count {
-  font-size: var(--text-xs);
-  opacity: 0.8;
 }
 
 /* 高级筛选 */

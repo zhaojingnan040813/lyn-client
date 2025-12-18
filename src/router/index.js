@@ -60,8 +60,9 @@ const routes = [
     name: 'AiAddDish',
     component: () => import('../views/AiAddDish.vue'),
     meta: {
-      title: 'AI添加菜品 - 智能体质膳食推荐系统',
-      requiresAuth: true // 需要登录
+      title: 'AI生成菜品 - 智能体质膳食推荐系统',
+      requiresAuth: true, // 需要登录
+      requiresAdmin: true // 需要管理员权限
     }
   },
   {

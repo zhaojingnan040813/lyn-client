@@ -108,7 +108,8 @@
                   ⏱️ {{ recipe.cookingTime }}分钟
                 </span>
                 <span v-if="recipe.difficulty" class="meta-item">
-                  📊 {{ getDifficultyLabel(recipe.difficulty) }}
+                  <!-- 📊 {{ getDifficultyLabel(recipe.difficulty) }} -->
+                  📊 {{ recipe.difficulty }}
                 </span>
                 <span v-if="recipe.category" class="meta-item category-tag">
                   {{ getCategoryLabel(recipe.category) }}

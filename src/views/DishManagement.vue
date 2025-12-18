@@ -28,6 +28,10 @@
             </button>
           </div>
 
+          <button class="btn btn-accent" @click="goToAiGenerate">
+            <span class="btn-icon">🤖</span>
+            AI生成菜品
+          </button>
           <button class="btn btn-primary" @click="openCreateModal">
             <span class="btn-icon">➕</span>
             新增菜品
@@ -369,12 +373,14 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useToast } from '@/utils/toast'
 import { recipeApi } from '@/api/index.js'
 import DishDetailModal from '@/components/dish/DishDetailModal.vue'
 import DishFormModal from '@/components/dish/DishFormModal.vue'
 import DishListItem from '@/components/dish/DishListItem.vue'
 
+const router = useRouter()
 const toast = useToast()
 
 // 响应式数据
@@ -736,6 +742,11 @@ const bulkDelete = async () => {
   }
 }
 
+// 跳转到AI生成页面
+const goToAiGenerate = () => {
+  router.push('/ai-add-dish')
+}
+
 // 布局切换方法
 const setViewMode = mode => {
   viewMode.value = mode
@@ -903,6 +914,17 @@ watch(
 .btn-danger {
   background: var(--color-error);
   color: var(--color-text-inverse);
+}
+
+.btn-accent {
+  background: var(--gradient-accent);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* 统计概览 */
