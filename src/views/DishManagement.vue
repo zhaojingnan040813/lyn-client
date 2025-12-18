@@ -8,6 +8,26 @@
           <p class="page-subtitle">管理所有菜谱信息，维护系统数据库</p>
         </div>
         <div class="header-actions">
+          <!-- 布局切换 -->
+          <div class="view-toggle">
+            <button
+              :class="{ active: viewMode === 'grid' }"
+              @click="setViewMode('grid')"
+              class="toggle-btn"
+              title="网格视图"
+            >
+              <span class="view-icon">⊞</span>
+            </button>
+            <button
+              :class="{ active: viewMode === 'list' }"
+              @click="setViewMode('list')"
+              class="toggle-btn"
+              title="列表视图"
+            >
+              <span class="view-icon">☰</span>
+            </button>
+          </div>
+
           <button class="btn btn-primary" @click="openCreateModal">
             <span class="btn-icon">➕</span>
             新增菜品
@@ -162,84 +182,116 @@
         </div>
       </div>
 
-      <!-- 菜品网格 -->
-      <div v-if="!loading && dishes.length > 0" class="dishes-grid">
-        <div
-          v-for="dish in dishes"
-          :key="dish.id"
-          class="dish-card"
-          :class="{ selected: selectedItems.includes(dish.id) }"
-        >
-          <!-- 选择框 -->
-          <div class="dish-checkbox">
-            <input
-              type="checkbox"
-              :checked="selectedItems.includes(dish.id)"
-              @change="toggleItemSelection(dish.id)"
-            />
-          </div>
-
-          <!-- 状态标识 -->
-          <div class="dish-status" :class="{ active: dish.isActive }">
-            <span class="status-dot"></span>
-            <span class="status-text">{{ dish.isActive ? '启用' : '禁用' }}</span>
-          </div>
-
-          <!-- 菜品图片 -->
-          <div class="dish-image">
-            <img
-              v-if="dish.image && !dish.imageError"
-              :src="dish.image"
-              :alt="dish.name"
-              @error="dish.imageError = true"
-            />
-            <div v-else class="image-placeholder">
-              <span class="placeholder-emoji">{{ dish.emoji || '🍽️' }}</span>
-            </div>
-          </div>
-
-          <!-- 菜品信息 -->
-          <div class="dish-content">
-            <h4 class="dish-name">{{ dish.name }}</h4>
-            <p class="dish-description">{{ dish.description }}</p>
-
-            <div class="dish-meta">
-              <span class="meta-item">
-                <span class="meta-icon">⏱️</span>
-                {{ dish.cookingTime }}分钟
-              </span>
-              <span class="meta-item">
-                <span class="meta-icon">📊</span>
-                {{ dish.difficulty }}
-              </span>
-              <span class="meta-item">
-                <span class="meta-icon">🏷️</span>
-                {{ getCategoryLabel(dish.category) }}
-              </span>
-            </div>
-
-            <div class="dish-tags">
-              <span v-for="tag in dish.tags?.slice(0, 3)" :key="tag" class="tag">
-                {{ tag }}
-              </span>
-            </div>
-          </div>
-
-          <!-- 操作按钮 -->
-          <div class="dish-actions">
-            <button class="action-btn view-btn" @click="viewDish(dish)" title="查看详情">👁️</button>
-            <button class="action-btn edit-btn" @click="editDish(dish)" title="编辑">✏️</button>
-            <button
-              class="action-btn status-btn"
-              @click="toggleDishStatus(dish)"
-              :title="dish.isActive ? '禁用' : '启用'"
+      <!-- 布局切换动画 -->
+      <transition name="layout-switch" mode="out-in">
+        <div class="layout-wrapper">
+          <!-- 网格布局 -->
+          <div
+            v-if="!loading && dishes.length > 0 && viewMode === 'grid'"
+            key="grid"
+            class="dishes-grid"
+          >
+            <div
+              v-for="dish in dishes"
+              :key="dish.id"
+              class="dish-card"
+              :class="{ selected: selectedItems.includes(dish.id) }"
             >
-              {{ dish.isActive ? '⏸️' : '▶️' }}
-            </button>
-            <button class="action-btn delete-btn" @click="deleteDish(dish)" title="删除">🗑️</button>
+              <!-- 选择框 -->
+              <div class="dish-checkbox">
+                <input
+                  type="checkbox"
+                  :checked="selectedItems.includes(dish.id)"
+                  @change="toggleItemSelection(dish.id)"
+                />
+              </div>
+
+              <!-- 状态标识 -->
+              <div class="dish-status" :class="{ active: dish.isActive }">
+                <span class="status-dot"></span>
+                <span class="status-text">{{ dish.isActive ? '启用' : '禁用' }}</span>
+              </div>
+
+              <!-- 菜品图片 -->
+              <div class="dish-image">
+                <img
+                  v-if="dish.image && !dish.imageError"
+                  :src="dish.image"
+                  :alt="dish.name"
+                  @error="dish.imageError = true"
+                />
+                <div v-else class="image-placeholder">
+                  <span class="placeholder-emoji">{{ dish.emoji || '🍽️' }}</span>
+                </div>
+              </div>
+
+              <!-- 菜品信息 -->
+              <div class="dish-content">
+                <h4 class="dish-name">{{ dish.name }}</h4>
+                <p class="dish-description">{{ dish.description }}</p>
+
+                <div class="dish-meta">
+                  <span class="meta-item">
+                    <span class="meta-icon">⏱️</span>
+                    {{ dish.cookingTime }}分钟
+                  </span>
+                  <span class="meta-item">
+                    <span class="meta-icon">📊</span>
+                    {{ dish.difficulty }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="meta-icon">🏷️</span>
+                    {{ getCategoryLabel(dish.category) }}
+                  </span>
+                </div>
+
+                <div class="dish-tags">
+                  <span v-for="tag in dish.tags?.slice(0, 3)" :key="tag" class="tag">
+                    {{ tag }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="dish-actions">
+                <button class="action-btn view-btn" @click="viewDish(dish)" title="查看详情">
+                  👁️
+                </button>
+                <button class="action-btn edit-btn" @click="editDish(dish)" title="编辑">✏️</button>
+                <button
+                  class="action-btn status-btn"
+                  @click="toggleDishStatus(dish)"
+                  :title="dish.isActive ? '禁用' : '启用'"
+                >
+                  {{ dish.isActive ? '⏸️' : '▶️' }}
+                </button>
+                <button class="action-btn delete-btn" @click="deleteDish(dish)" title="删除">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 列表布局 -->
+          <div
+            v-if="!loading && dishes.length > 0 && viewMode === 'list'"
+            key="list"
+            class="dishes-list"
+          >
+            <DishListItem
+              v-for="dish in dishes"
+              :key="dish.id"
+              :dish="dish"
+              :selected="selectedItems.includes(dish.id)"
+              @select="toggleItemSelection"
+              @view="viewDish"
+              @edit="editDish"
+              @toggle-status="toggleDishStatus"
+              @delete="deleteDish"
+            />
           </div>
         </div>
-      </div>
+      </transition>
 
       <!-- 加载状态 -->
       <div v-if="loading" class="loading-state">
@@ -321,6 +373,7 @@ import { useToast } from '@/utils/toast'
 import { recipeApi } from '@/api/index.js'
 import DishDetailModal from '@/components/dish/DishDetailModal.vue'
 import DishFormModal from '@/components/dish/DishFormModal.vue'
+import DishListItem from '@/components/dish/DishListItem.vue'
 
 const toast = useToast()
 
@@ -333,6 +386,7 @@ const currentDish = ref(null)
 const editingDish = ref(null)
 const showDetailModal = ref(false)
 const showFormModal = ref(false)
+const viewMode = ref('grid') // 'grid' | 'list'
 
 // 搜索参数
 const searchParams = ref({
@@ -682,11 +736,23 @@ const bulkDelete = async () => {
   }
 }
 
+// 布局切换方法
+const setViewMode = mode => {
+  viewMode.value = mode
+  localStorage.setItem('dish-view-mode', mode)
+}
+
 // 搜索防抖
 const searchTimeout = ref(null)
 
 // 生命周期
 onMounted(() => {
+  // 读取保存的布局偏好
+  const savedMode = localStorage.getItem('dish-view-mode')
+  if (savedMode && ['grid', 'list'].includes(savedMode)) {
+    viewMode.value = savedMode
+  }
+
   fetchDishes()
 })
 
@@ -744,6 +810,44 @@ watch(
 .header-actions {
   display: flex;
   gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* 布局切换 */
+.view-toggle {
+  display: flex;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-bg-primary);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: var(--text-lg);
+  color: var(--color-text-tertiary);
+}
+
+.toggle-btn:hover {
+  background: var(--color-bg-secondary);
+}
+
+.toggle-btn.active {
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+}
+
+.toggle-btn:first-child {
+  border-right: 1px solid var(--color-border-light);
 }
 
 .btn {
@@ -1144,6 +1248,37 @@ watch(
   border: 1px solid var(--color-border-light);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-sm);
+}
+
+/* 列表布局 */
+.dishes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-light);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 布局切换动画 */
+.layout-switch-enter-active,
+.layout-switch-leave-active {
+  transition: all var(--transition-slow);
+  overflow: hidden;
+}
+
+.layout-switch-enter-from,
+.layout-switch-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.layout-switch-enter-to,
+.layout-switch-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .dish-card {
