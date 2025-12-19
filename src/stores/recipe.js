@@ -134,7 +134,10 @@ export const useRecipeStore = defineStore('recipe', () => {
       })
 
       if (response.code === 0) {
-        return response.data.list || []
+        const recipeList = response.data.list || []
+        // 设置到 recipes 状态中
+        recipes.value = recipeList
+        return recipeList
       } else {
         throw new Error(response.message || '获取推荐菜谱失败')
       }

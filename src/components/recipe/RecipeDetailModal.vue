@@ -91,7 +91,6 @@
                     v-for="constitution in recipe.suitableConstitutions"
                     :key="constitution"
                     class="constitution-tag suitable"
-                    :style="{ '--constitution-color': getConstitutionColor(constitution) }"
                   >
                     {{ getConstitutionLabel(constitution) }}
                   </span>

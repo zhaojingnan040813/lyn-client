@@ -15,7 +15,8 @@ export default defineConfig({
         port: 5173,
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                // target: 'http://localhost:3000',
+                target: 'https://lyn-backend-165954-5-1362504576.sh.run.tcloudbase.com',
                 changeOrigin: true,
                 timeout: 300000 // 5分钟超时，确保AI接口有足够时间响应
             }
