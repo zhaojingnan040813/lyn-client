@@ -1,8 +1,14 @@
 import axios from 'axios'
 
+// 从环境变量获取 API 基础 URL
+const getApiBaseUrl = () => {
+  // Vite 的环境变量需要 VITE_ 前缀
+  return import.meta.env.VITE_API_BASE_URL || '/api'
+}
+
 // 创建通用axios实例
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: getApiBaseUrl(),
   timeout: 600000, //
   headers: {
     'Content-Type': 'application/json'
@@ -11,7 +17,7 @@ const request = axios.create({
 
 // 创建AI专用axios实例
 const aiRequest = axios.create({
-  baseURL: '/api',
+  baseURL: getApiBaseUrl(),
   timeout: 300000, // 5分钟超时（300秒），适用于AI接口
   headers: {
     'Content-Type': 'application/json'
