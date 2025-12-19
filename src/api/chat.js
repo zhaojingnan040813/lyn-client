@@ -1,5 +1,11 @@
 import request, { aiRequest } from './request.js'
 
+// 从环境变量获取 API 基础 URL
+const getApiBaseUrl = () => {
+  // Vite 的环境变量需要 VITE_ 前缀
+  return import.meta.env.VITE_API_BASE_URL || '/api'
+}
+
 /**
  * 发送消息到 AI
  * @param {string} message - 用户消息
@@ -27,7 +33,9 @@ export const sendMessageStream = async (
   const sessionId = localStorage.getItem('sessionId')
 
   try {
-    const response = await fetch('/api/chat/stream', {
+    const baseURL = getApiBaseUrl()
+    const fullUrl = `${baseURL}/chat/stream`
+    const response = await fetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
