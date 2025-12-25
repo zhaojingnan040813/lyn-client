@@ -4,7 +4,9 @@
       <div class="header-content">
         <!-- Logo 和品牌 -->
         <router-link to="/" class="brand">
-          <div class="brand-icon">智</div>
+          <div class="brand-icon">
+            <img src="@/png/logo.png" alt="Logo" />
+          </div>
           <span class="brand-name">智能体质膳食推荐系统</span>
         </router-link>
 
@@ -200,10 +202,14 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   background: var(--gradient-primary);
-  color: var(--color-text-inverse);
   border-radius: var(--radius-lg);
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
+  overflow: hidden;
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .brand-name {
