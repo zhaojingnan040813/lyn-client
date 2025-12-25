@@ -110,11 +110,17 @@ import { ref, reactive } from 'vue'
 import { useToast } from '@/utils/toast'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
+const props = defineProps({
+  isRecommending: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const emit = defineEmits(['recommend'])
 
 const toast = useToast()
 
-const isRecommending = ref(false)
 const ingredientInput = ref('')
 
 // 用餐类型选项
@@ -160,9 +166,7 @@ const resetForm = () => {
 
 // 处理推荐
 const handleRecommend = async () => {
-  if (isRecommending.value) return
-
-  isRecommending.value = true
+  if (props.isRecommending) return
 
   try {
     // 构建推荐参数
@@ -178,8 +182,6 @@ const handleRecommend = async () => {
   } catch (error) {
     console.error('推荐失败:', error)
     toast.error('推荐失败，请重试')
-  } finally {
-    isRecommending.value = false
   }
 }
 </script>
