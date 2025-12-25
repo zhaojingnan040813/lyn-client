@@ -5,7 +5,7 @@
         <!-- Logo 和品牌 -->
         <router-link to="/" class="brand">
           <div class="brand-icon">智</div>
-          <span class="brand-name">智膳</span>
+          <span class="brand-name">智能体质膳食推荐系统</span>
         </router-link>
 
         <!-- 导航菜单 -->
@@ -259,6 +259,18 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+}
+
+.user-info .btn-ghost {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--text-xs);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-full);
+}
+
+.user-info .btn-ghost:hover {
+  background: var(--color-primary-dark);
 }
 
 .user-badge {

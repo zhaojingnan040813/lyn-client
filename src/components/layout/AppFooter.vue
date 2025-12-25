@@ -3,7 +3,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
-          <h3 class="footer-title">智膳</h3>
+          <h3 class="footer-title">智能体质膳食推荐系统</h3>
           <p class="footer-desc">基于中医体质理论的智能膳食推荐系统</p>
         </div>
 
@@ -27,7 +27,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="copyright">© {{ currentYear }} 智膳. All rights reserved.</p>
+        <p class="copyright">© {{ currentYear }} 智能体质膳食推荐系统. All rights reserved.</p>
       </div>
     </div>
   </footer>
