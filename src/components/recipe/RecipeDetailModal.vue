@@ -406,8 +406,6 @@ const handleOverlayClick = () => {
 .ai-info {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: var(--gradient-accent);
-  background-opacity: 0.1;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-accent);
 }
