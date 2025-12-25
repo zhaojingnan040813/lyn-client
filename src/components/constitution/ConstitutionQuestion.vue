@@ -1,58 +1,6 @@
 <template>
   <div class="constitution-question">
-    <!-- 问题头部 -->
-    <div class="question-header">
-      <div class="question-progress">
-        <span class="progress-text">{{ currentQuestionIndex + 1 }} / {{ totalQuestions }}</span>
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{ width: `${progressPercentage}%` }"></div>
-        </div>
-      </div>
-      <h2 class="question-title">{{ question.question }}</h2>
-    </div>
-
-    <!-- 选项列表 -->
-    <div class="options-container">
-      <div
-        v-for="(option, index) in question.options"
-        :key="index"
-        class="option-item"
-        :class="{
-          selected: selectedOption === index,
-          disabled: disabled
-        }"
-        @click="selectOption(index)"
-      >
-        <div class="option-radio">
-          <div class="radio-circle" :class="{ checked: selectedOption === index }"></div>
-        </div>
-        <div class="option-content">
-          <div class="option-text">{{ option.text }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 操作按钮 -->
-    <div class="question-actions">
-      <button
-        v-if="currentQuestionIndex > 0"
-        class="btn btn-ghost"
-        @click="previousQuestion"
-        :disabled="disabled"
-      >
-        上一题
-      </button>
-
-      <button
-        class="btn btn-primary"
-        @click="nextQuestion"
-        :disabled="disabled || selectedOption === null"
-      >
-        {{ isLastQuestion ? '完成测评' : '下一题' }}
-      </button>
-    </div>
-
-    <!-- 快速跳转 -->
+    <!-- 快速跳转 - 左侧导航 -->
     <div class="quick-navigation" v-if="showQuickNav">
       <div class="nav-title">快速跳转</div>
       <div class="nav-dots">
@@ -69,6 +17,61 @@
           :disabled="disabled"
         >
           {{ index + 1 }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 右侧主要内容 -->
+    <div class="content-main">
+      <!-- 问题头部 -->
+      <div class="question-header">
+        <div class="question-progress">
+          <span class="progress-text">{{ currentQuestionIndex + 1 }} / {{ totalQuestions }}</span>
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: `${progressPercentage}%` }"></div>
+          </div>
+        </div>
+        <h2 class="question-title">{{ question.question }}</h2>
+      </div>
+
+      <!-- 选项列表 -->
+      <div class="options-container">
+        <div
+          v-for="(option, index) in question.options"
+          :key="index"
+          class="option-item"
+          :class="{
+            selected: selectedOption === index,
+            disabled: disabled
+          }"
+          @click="selectOption(index)"
+        >
+          <div class="option-radio">
+            <div class="radio-circle" :class="{ checked: selectedOption === index }"></div>
+          </div>
+          <div class="option-content">
+            <div class="option-text">{{ option.text }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="question-actions">
+        <button
+          v-if="currentQuestionIndex > 0"
+          class="btn btn-ghost"
+          @click="previousQuestion"
+          :disabled="disabled"
+        >
+          上一题
+        </button>
+
+        <button
+          class="btn btn-primary"
+          @click="nextQuestion"
+          :disabled="disabled || selectedOption === null"
+        >
+          {{ isLastQuestion ? '完成测评' : '下一题' }}
         </button>
       </div>
     </div>
@@ -160,9 +163,17 @@ const jumpToQuestion = index => {
 
 <style scoped>
 .constitution-question {
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
   padding: var(--spacing-xl);
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.content-main {
+  flex: 1;
+  min-width: 0;
 }
 
 /* 问题头部 */
@@ -301,9 +312,9 @@ const jumpToQuestion = index => {
 
 /* 快速导航 */
 .quick-navigation {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-xl);
-  border-top: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+  padding-right: var(--spacing-xl);
+  border-right: 1px solid var(--color-border-light);
 }
 
 .nav-title {
@@ -315,8 +326,10 @@ const jumpToQuestion = index => {
 
 .nav-dots {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--spacing-sm);
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .nav-dot {
@@ -367,7 +380,23 @@ const jumpToQuestion = index => {
 /* 响应式 */
 @media (max-width: 768px) {
   .constitution-question {
+    flex-direction: column;
     padding: var(--spacing-lg);
+  }
+
+  .quick-navigation {
+    flex-direction: row;
+    padding-right: 0;
+    padding-bottom: var(--spacing-lg);
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+    order: 2;
+  }
+
+  .nav-dots {
+    flex-direction: row;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .question-title {
