@@ -60,7 +60,6 @@
             v-for="constitution in recipe.suitableConstitutions?.slice(0, 3)"
             :key="constitution"
             class="constitution-tag suitable"
-            :style="{ '--constitution-color': getConstitutionColor(constitution) }"
           >
             {{ getConstitutionLabel(constitution) }}
           </span>
@@ -73,7 +72,6 @@
             v-for="constitution in recipe.avoidConstitutions?.slice(0, 2)"
             :key="constitution"
             class="constitution-tag avoid"
-            :style="{ '--constitution-color': getConstitutionColor(constitution) }"
           >
             {{ getConstitutionLabel(constitution) }}
           </span>

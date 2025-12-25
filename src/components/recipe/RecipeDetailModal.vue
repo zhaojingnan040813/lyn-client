@@ -103,7 +103,6 @@
                     v-for="constitution in recipe.avoidConstitutions"
                     :key="constitution"
                     class="constitution-tag avoid"
-                    :style="{ '--constitution-color': getConstitutionColor(constitution) }"
                   >
                     {{ getConstitutionLabel(constitution) }}
                   </span>

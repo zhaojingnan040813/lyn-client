@@ -68,7 +68,6 @@
               v-for="type in dish.suitableConstitutions?.slice(0, 3)"
               :key="type"
               class="constitution-tag suitable"
-              :style="{ '--constitution-color': getConstitutionColor(type) }"
             >
               {{ getConstitutionLabel(type) }}
             </span>
@@ -84,7 +83,6 @@
               v-for="type in dish.avoidConstitutions?.slice(0, 2)"
               :key="type"
               class="constitution-tag avoid"
-              :style="{ '--constitution-color': getConstitutionColor(type) }"
             >
               {{ getConstitutionLabel(type) }}
             </span>

@@ -140,7 +140,6 @@
                       v-for="constitution in constitutionOptions"
                       :key="constitution.key"
                       class="constitution-label"
-                      :style="{ '--constitution-color': getConstitutionColor(constitution.key) }"
                     >
                       <input
                         v-model="formData.suitableConstitutions"
@@ -159,7 +158,6 @@
                       v-for="constitution in constitutionOptions"
                       :key="constitution.key"
                       class="constitution-label"
-                      :style="{ '--constitution-color': getConstitutionColor(constitution.key) }"
                     >
                       <input
                         v-model="formData.avoidConstitutions"

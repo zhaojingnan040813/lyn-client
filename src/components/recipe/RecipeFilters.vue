@@ -88,7 +88,6 @@
                 v-for="constitution in constitutionOptions"
                 :key="constitution.key"
                 class="constitution-option"
-                :style="{ '--constitution-color': getConstitutionColor(constitution.key) }"
               >
                 <input
                   v-model="filters.constitutions"
