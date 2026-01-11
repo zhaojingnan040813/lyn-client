@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => {
         proxy: {
             '/api': {
                 // 只在开发环境启用代理
-                target: 'https://lyn-backend-165954-5-1362504576.sh.run.tcloudbase.com',
-                // target: 'http://localhost:3000', // 替换为你的目标API地址
+                // target: 'https://lyn-backend-165954-5-1362504576.sh.run.tcloudbase.com',
+                target: 'http://localhost:3000', // 替换为你的目标API地址
                 changeOrigin: true,
                 timeout: 300000 // 5分钟超时，确保AI接口有足够时间响应
             }
