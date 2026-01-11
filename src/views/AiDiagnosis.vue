@@ -109,7 +109,7 @@
               <button
                 type="button"
                 class="btn btn-ghost btn-sm"
-                @click="handleClear"
+                @click="showClearModal = true"
                 :disabled="messages.length === 0"
               >
                 清空对话
@@ -126,6 +126,17 @@
         </div>
       </main>
     </div>
+
+    <!-- 清空对话确认弹窗 -->
+    <ConfirmModal
+      v-model:visible="showClearModal"
+      title="清空对话"
+      message="确定要清空所有对话记录吗？此操作不可恢复。"
+      type="warning"
+      confirm-text="清空"
+      cancel-text="取消"
+      @confirm="handleClearConfirm"
+    />
   </div>
 </template>
 
@@ -140,6 +151,7 @@ import {
   loadMessages,
   clearMessages as clearDBMessages
 } from '@/utils/chatDB'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
@@ -150,6 +162,7 @@ const inputMessage = ref('')
 const isThinking = ref(false)
 const messagesContainer = ref(null)
 const isDBReady = ref(false)
+const showClearModal = ref(false)
 
 // 检查是否有正在流式输出的消息
 const hasStreamingMessage = computed(() => {
@@ -278,12 +291,10 @@ const handleSend = async () => {
   }
 }
 
-const handleClear = async () => {
-  if (confirm('确定要清空对话记录吗？')) {
-    messages.value = []
-    await clearDBMessages()
-    toast.info('对话已清空')
-  }
+const handleClearConfirm = async () => {
+  messages.value = []
+  await clearDBMessages()
+  toast.info('对话已清空')
 }
 
 // 监听消息变化，自动保存到 IndexedDB
