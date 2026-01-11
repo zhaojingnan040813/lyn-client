@@ -134,7 +134,12 @@ import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
 import { useToast } from '@/utils/toast'
-import { initDB, saveMessages, loadMessages, clearMessages as clearDBMessages } from '@/utils/chatDB'
+import {
+  initDB,
+  saveMessages,
+  loadMessages,
+  clearMessages as clearDBMessages
+} from '@/utils/chatDB'
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
@@ -207,21 +212,28 @@ const handleSend = async () => {
   if (!message || isThinking.value) return
 
   // 添加用户消息
+  const userTimestamp = Date.now()
   messages.value.push({
+    id: userTimestamp,
     role: 'user',
     content: message,
-    timestamp: Date.now()
+    timestamp: userTimestamp
   })
+
+  // 立即保存用户消息
+  await saveMessages(messages.value.filter(msg => !msg.isStreaming))
 
   inputMessage.value = ''
   scrollToBottom()
 
   // 添加一个空的 AI 消息占位
   const aiMessageIndex = messages.value.length
+  const aiTimestamp = Date.now() + 1 // 确保 ID 不重复
   messages.value.push({
+    id: aiTimestamp,
     role: 'assistant',
     content: '',
-    timestamp: Date.now(),
+    timestamp: aiTimestamp,
     isStreaming: true
   })
 
@@ -277,12 +289,13 @@ const handleClear = async () => {
 // 监听消息变化，自动保存到 IndexedDB
 watch(
   messages,
-  async (newMessages) => {
+  async newMessages => {
     if (isDBReady.value && newMessages.length > 0) {
       // 只保存非流式输出的消息
       const hasStreaming = newMessages.some(msg => msg.isStreaming)
       if (!hasStreaming) {
         await saveMessages(newMessages)
+        // console.log('对话已保存到 IndexedDB')
       }
     }
   },
