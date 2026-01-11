@@ -24,6 +24,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # 复制 nginx 配置（处理 SPA 路由）
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 5173
 
 CMD ["nginx", "-g", "daemon off;"]
