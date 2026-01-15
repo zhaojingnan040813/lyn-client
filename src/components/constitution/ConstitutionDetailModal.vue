@@ -150,6 +150,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { constitutionApi } from '@/api/index'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
   constitution: {
@@ -167,6 +168,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+
+// 用户 store
+const userStore = useUserStore()
 
 // 响应式数据
 const isLoading = ref(false)
@@ -234,11 +238,31 @@ const closeModal = () => {
 }
 
 // 选择体质
-const selectConstitution = () => {
-  if (props.onSelect) {
-    props.onSelect(constitutionDetail.value)
+const selectConstitution = async () => {
+  try {
+    isLoading.value = true
+    const constitutionType = constitutionDetail.value.type || props.constitution.type
+    
+    // 调用 API 更新用户体质
+    const success = await userStore.setConstitution(constitutionType, 'manual')
+    
+    if (success) {
+      // 获取体质详情以更新 store
+      await userStore.fetchConstitutionInfo(constitutionType)
+      
+      // 调用回调函数（如果有）
+      if (props.onSelect) {
+        props.onSelect(constitutionDetail.value)
+      }
+      closeModal()
+    } else {
+      console.error('设置体质失败')
+    }
+  } catch (error) {
+    console.error('选择体质时出错:', error)
+  } finally {
+    isLoading.value = false
   }
-  closeModal()
 }
 </script>
 

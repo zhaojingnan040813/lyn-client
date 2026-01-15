@@ -109,7 +109,7 @@
               <button
                 type="button"
                 class="btn btn-ghost btn-sm"
-                @click="handleClear"
+                @click="showClearModal = true"
                 :disabled="messages.length === 0"
               >
                 清空对话
@@ -126,14 +126,32 @@
         </div>
       </main>
     </div>
+
+    <!-- 清空对话确认弹窗 -->
+    <ConfirmModal
+      v-model:visible="showClearModal"
+      title="清空对话"
+      message="确定要清空所有对话记录吗？此操作不可恢复。"
+      type="warning"
+      confirm-text="清空"
+      cancel-text="取消"
+      @confirm="handleClearConfirm"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
 import { useToast } from '@/utils/toast'
+import {
+  initDB,
+  saveMessages,
+  loadMessages,
+  clearMessages as clearDBMessages
+} from '@/utils/chatDB'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
@@ -143,6 +161,8 @@ const messages = ref([])
 const inputMessage = ref('')
 const isThinking = ref(false)
 const messagesContainer = ref(null)
+const isDBReady = ref(false)
+const showClearModal = ref(false)
 
 // 检查是否有正在流式输出的消息
 const hasStreamingMessage = computed(() => {
@@ -205,21 +225,28 @@ const handleSend = async () => {
   if (!message || isThinking.value) return
 
   // 添加用户消息
+  const userTimestamp = Date.now()
   messages.value.push({
+    id: userTimestamp,
     role: 'user',
     content: message,
-    timestamp: Date.now()
+    timestamp: userTimestamp
   })
+
+  // 立即保存用户消息
+  await saveMessages(messages.value.filter(msg => !msg.isStreaming))
 
   inputMessage.value = ''
   scrollToBottom()
 
   // 添加一个空的 AI 消息占位
   const aiMessageIndex = messages.value.length
+  const aiTimestamp = Date.now() + 1 // 确保 ID 不重复
   messages.value.push({
+    id: aiTimestamp,
     role: 'assistant',
     content: '',
-    timestamp: Date.now(),
+    timestamp: aiTimestamp,
     isStreaming: true
   })
 
@@ -249,6 +276,8 @@ const handleSend = async () => {
       },
       onComplete: () => {
         messages.value[aiMessageIndex].isStreaming = false
+        // 流式输出完成后保存消息
+        saveMessages(messages.value)
         scrollToBottom()
       }
     })
@@ -262,14 +291,40 @@ const handleSend = async () => {
   }
 }
 
-const handleClear = () => {
-  if (confirm('确定要清空对话记录吗？')) {
-    messages.value = []
-    toast.info('对话已清空')
-  }
+const handleClearConfirm = async () => {
+  messages.value = []
+  await clearDBMessages()
+  toast.info('对话已清空')
 }
 
-onMounted(() => {
+// 监听消息变化，自动保存到 IndexedDB
+watch(
+  messages,
+  async newMessages => {
+    if (isDBReady.value && newMessages.length > 0) {
+      // 只保存非流式输出的消息
+      const hasStreaming = newMessages.some(msg => msg.isStreaming)
+      if (!hasStreaming) {
+        await saveMessages(newMessages)
+        // console.log('对话已保存到 IndexedDB')
+      }
+    }
+  },
+  { deep: true }
+)
+
+onMounted(async () => {
+  try {
+    await initDB()
+    const savedMessages = await loadMessages()
+    if (savedMessages.length > 0) {
+      messages.value = savedMessages
+    }
+    isDBReady.value = true
+  } catch (error) {
+    console.error('初始化 IndexedDB 失败:', error)
+    isDBReady.value = true
+  }
   scrollToBottom()
 })
 </script>

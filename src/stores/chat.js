@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { sendMessage as sendMessageApi, sendMessageStream as sendMessageStreamApi } from '../api/chat.js'
+import {
+  sendMessage as sendMessageApi,
+  sendMessageStream as sendMessageStreamApi
+} from '../api/chat.js'
 
 export const useChatStore = defineStore('chat', () => {
   // 聊天消息列表
@@ -54,7 +57,7 @@ export const useChatStore = defineStore('chat', () => {
       console.log('发送消息到 AI:', { content, historyLength: history.length })
       const response = await sendMessageApi(content, history)
       console.log('AI 响应:', response)
-      
+
       // API 返回的数据结构是 { code, message, data: { reply } }
       // 响应拦截器已经返回了 response.data，所以这里的 response 就是后端返回的完整对象
       if (response && response.code === 0 && response.data) {
@@ -93,13 +96,13 @@ export const useChatStore = defineStore('chat', () => {
 
     try {
       console.log('发送流式消息到 AI:', { content, historyLength: history.length })
-      
+
       await sendMessageStreamApi(content, history, {
-        onMessage: (chunk) => {
-          console.log('收到流式数据块:', chunk)
+        onMessage: chunk => {
+          // console.log('收到流式数据块:', chunk)
           callbacks.onMessage?.(chunk)
         },
-        onError: (error) => {
+        onError: error => {
           console.error('流式消息错误:', error)
           callbacks.onError?.(error)
         },

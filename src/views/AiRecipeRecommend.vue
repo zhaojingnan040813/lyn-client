@@ -157,7 +157,7 @@ const handleRecommend = async params => {
     }
   } catch (error) {
     console.error('AI推荐失败:', error)
-    toast.error('AI推荐失败，请重试')
+    toast.error('用户偏好数据不存在，请先设置偏好')
   } finally {
     isRecommending.value = false
   }
